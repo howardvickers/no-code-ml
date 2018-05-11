@@ -13,6 +13,14 @@ def print_head(df):
     head = df.head().to_html()
     return Markup(head)
 
+def drop_unnamed_col(df):
+    unnamed_cols = ['Unnamed: 0', 'Unnamed: 0.1', 'Unnamed: 0.1.1']
+    columns = df.columns
+    for col in columns:
+        if col in unnamed_cols:
+            df.drop(col, axis=1, inplace=True)
+    return df
+
 app = Flask(__name__)
 
 @app.route('/upload.html')
@@ -98,7 +106,7 @@ def ols():
 def process():
     # if request.method=='POST':
     df = pd.read_csv('../data/df_reduced_cols.csv')
-    # df.reset_index(drop=True)
+
     existing_cols = list(df.columns)
     print('existing columns:', existing_cols)
 
@@ -108,14 +116,14 @@ def process():
         print('k:', k)
         print('v:', v)
         df.rename(columns={k: v}, inplace=True)
-
+    df = drop_unnamed_col(df)
     new_columns = list(df.columns)
     print('new columns:', new_columns)
 
     new_head = print_head(df)
     df.to_csv('../data/df_reduced_cols.csv')
     print('new_head', new_head)
-    return jsonify(new_head = new_head)
+    return jsonify(result = new_head)
         # return jsonify({'test' : new_head})
 
     # elif request.method=='GET':
