@@ -15,14 +15,16 @@ Note that the web app is intended as a conceptual project rather than a commerci
 ### Business Context
 This project is guided by a sense of a hyperthetical, yet practical business situation: a startup has sales or other data that is available as a csv file and wishes to gain insights into the data; perhaps a desire to predict future sales and to understand where to employ resources for the best performance.  
 
-### Functionality
+### Functionality (Bold represents working)
 The web app offers/will offer the following functionality:
-* upload csv files
-* view initial rows (equivalent to df.head() in pandas)
-* select columns for regression analysis
-* change column names
+* **upload csv files**
+* **view initial rows (equivalent to df.head() in pandas)**
+* **change column names**
+* **select columns for regression analysis**
+* select columns using jquery (without page refresh)
 * compare regressions with different tools (linear, random forest, etc)
 * save resulting datasets and regression analyses
+* manually delete all saved files at end of session
 
 ### Technologies Employed
 * python
@@ -35,4 +37,4 @@ The web app offers/will offer the following functionality:
 * ajax
 * bootstrap
 * html
-* css 
+* css
