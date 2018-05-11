@@ -43,6 +43,25 @@
 
       });
    </script>
+   <script>
+      $(document).ready(function(){
+          $("button").click(function(e){
+              e.preventDefault();
+              var models = $("r_form").serializeArray();
+              $.ajax({
+                data: models,
+                type : 'POST',
+                url : '/regressions',
+                success: function(data){
+                  $("#result").html(data.result);
+
+                  // alert(data.result);
+              }
+            })
+          });
+
+      });
+   </script>
 </head>
 {% endblock %}
 {% block content %}
@@ -61,39 +80,105 @@
    <h1>Drag-n-Drop ML: <small>Code-Free Machine Learning</small></h1>
    </br>
    <div class="container">
+
+     <div class="">
+        <div class="jumbotron" style="overflow-x:scroll; white-space: nowrap;">
+           <h3>Rename Columns</h3>
+           <form action="/process">
+              <table class="table table-hover">
+                 <thead>
+                    <tr>
+                       <th scope="col">Old Name</th>
+                       <th scope="col">New Name</th>
+                    </tr>
+                 </thead>
+                 <tbody>
+                    {% for col in columns %}
+                    <tr>
+                       <td>{{col}}</td>
+                       <td>
+                          <input type="text" name="{{col}}" placeholder="New Column Name">
+                       </td>
+                    </tr>
+                    {% endfor %}
+              </table>
+              <button type="submit" class="btn btn-primary" >Rename Columns</button>
+           </form>
+        </div>
+     </div>
+
+
+     <div class="">
+        <div class="jumbotron" style="overflow-x:scroll; white-space: nowrap;">
+           <h3>Table Summary with New Column Names</h3>
+           <div class="table table-hover">
+              <div id="result">
+              </div>
+           </div>
+        </div>
+     </div>
+
+
+
+
+
+
+
+
+
+
+
+
       <div class="row">
-         <div class="col-sm-6">
+         <div class="col-sm-5">
             <div class="jumbotron">
-               <h3>Rename Columns</h3>
-               <form action="/process">
+               <h3>Regressions</h3>
+               <form action="/regressions">
                   <table class="table table-hover">
                      <thead>
                         <tr>
-                           <th scope="col">Old Name</th>
-                           <th scope="col">New Name</th>
+                           <th scope="col">Model</th>
+                           <th scope="col">Select</th>
                         </tr>
                      </thead>
                      <tbody>
-                        {% for col in columns %}
+                        {% for model in models %}
                         <tr>
-                           <td>{{col}}</td>
+                           <td>{{model.title()}}</td>
                            <td>
-                              <input type="text" name="{{col}}" placeholder="New Column Name">
+                              <input type="checkbox" name="{{model}}" value="run">
                            </td>
                         </tr>
                         {% endfor %}
                   </table>
-                  <button type="submit" class="btn btn-primary" >Submit Here</button>
+                  <button type="submit" class="btn btn-primary" >Run Regressions</button>
                </form>
             </div>
          </div>
-         <div class="col-sm-6">
-            <div class="jumbotron">
-               <h3>Table Summary with New Column Names</h3>
-               <div class="table table-hover">
-                  <div id="result">
-                  </div>
-               </div>
+         <div class="col-sm-7">
+            <div class="jumbotron" style="overflow-x:scroll; white-space: nowrap;">
+               <h3>Regression Results</h3>
+               <table class="table table-hover">
+                 <thead>
+                   <tr>
+                     <th scope="col">Model</th>
+                     <th scope="col">RMSE (Train)</th>
+                     <th scope="col">RMSE (Test)</th>
+                     <th scope="col">R-Squared</th>
+                   </tr>
+                 </thead>
+                 <tbody>
+                   {% for k, v in model_comparison_dict.items() %}
+                   <tr>
+                     <td>{{k}}</td>
+                     <td>{{v[0]}}</td>
+                     <td>{{v[1]}}</td>
+                     <td>{{v[2]}}</td>
+
+                   </tr>
+                   {% endfor %}
+                 </tbody>
+               </table>
             </div>
          </div>
       </div>
