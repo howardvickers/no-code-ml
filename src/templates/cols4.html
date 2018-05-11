@@ -32,9 +32,15 @@
               $.ajax({
                 data: dataResults,
                 type : 'POST',
-                url : '/process'
-              })
+                url : '/process',
+                success: function(data){
+                  $("#result").html(data.result);
+
+                  // alert(data.result);
+              }
+            })
           });
+
       });
    </script>
 </head>
@@ -78,7 +84,9 @@
                         {% endfor %}
                         <button type="submit" class="btn btn-primary" >Submit Here</button>
                   </form>
-                  <h1><small>{{new_head}}</small></h1>
+                  <div class="table table-hover">
+                  <div id="result"></div>
+                </div>
                </div>
             </div>
          </div>
