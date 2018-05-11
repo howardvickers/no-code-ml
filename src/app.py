@@ -8,18 +8,34 @@ import pandas as pd
 import numpy as np
 import os
 from ols_summary import train_model as ols_tm
+from regressions import run_models as rm
 
 def print_head(df):
+    """converts pandas 'head' to html; returns html"""
     head = df.head().to_html()
     return Markup(head)
 
 def drop_unnamed_col(df):
+    """drops any unnamed columns; returns df"""
     unnamed_cols = ['Unnamed: 0', 'Unnamed: 0.1', 'Unnamed: 0.1.1']
     columns = df.columns
     for col in columns:
         if col in unnamed_cols:
             df.drop(col, axis=1, inplace=True)
     return df
+
+def compare_models(data_url, y, models):
+    """passes list of models to compare to GridSearchCV in rm(); returns model_comparison_dict"""
+    X, y = get_X_y(data_url, y)
+    model_comparison_dict = rm(X, y, models)
+    return model_comparison_dict
+
+def get_X_y(data_url, y):
+    """reloads data as csv and separates into two dataframes (X, y); returns X, y"""
+    df = read_csv(data_url)
+    X = df.drop(y, axis=1)
+    y = df[y]
+    return X, y
 
 app = Flask(__name__)
 
@@ -89,14 +105,14 @@ def select_cols():
     else:
         return("ok")
 
-@app.route('/rename_cols', methods=["POST"])
-def rename_cols():
-    return flask.render_template(
-                            'cols4.html',
-                            head = head,
-                            columns = columns
-    )
+@app.route('/regressions', methods=["POST"])
+def regressions():
+    data_url = '../data/df_reduced_cols.csv'
+    y = global y
+    selected_models = list(request.form.keys())
+    model_comparison_dict = compare_models(data_url, y, selected_models)
 
+    return jsonify(model_comparison_dict = model_comparison_dict)
 
 @app.route('/ols', methods=["POST"])
 def ols():
@@ -124,12 +140,6 @@ def process():
     df.to_csv('../data/df_reduced_cols.csv')
     print('new_head', new_head)
     return jsonify(result = new_head)
-        # return jsonify({'test' : new_head})
-
-    # elif request.method=='GET':
-    #     return "OK this is another GET method"
-    # else:
-    #     return("ok")
 
 if __name__ == "__main__":
     Bootstrap(app)
