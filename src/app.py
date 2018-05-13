@@ -10,6 +10,16 @@ import os
 from ols_summary import train_model as ols_tm
 from regressions import run_models as rm
 
+def build_regression_results_table(dict):
+    top = '<table class="table table-hover"> <thead> <tr> <th scope="col">Model</th> <th scope="col">RMSE (Train)</th> <th scope="col">RMSE (Test)</th> <th scope="col">R-Squared</th> </tr> </thead> <tbody>'
+    middle = '<tr> <td>{}</td> <td>{}</td> <td>{}</td> <td>{}</td> </tr>'
+    bottom =   '</tbody></table>'
+    mid_rows = ""
+    for k, v in dict.items():
+        row = middle.format(k, v[0], v[1], v[2])
+        mid_rows += row
+    return top+mid_rows+bottom
+
 def print_head(df):
     """converts pandas 'head' to html; returns html"""
     head = df.head().to_html()
@@ -26,13 +36,16 @@ def drop_unnamed_col(df):
 
 def compare_models(data_url, y, models):
     """passes list of models to compare to GridSearchCV in rm(); returns model_comparison_dict"""
-    X, y = get_X_y(data_url, y)
+    # X, y = get_X_y(data_url, y)
+    X = 0
+    y = 0
+    models = []
     model_comparison_dict = rm(X, y, models)
     return model_comparison_dict
 
 def get_X_y(data_url, y):
     """reloads data as csv and separates into two dataframes (X, y); returns X, y"""
-    df = read_csv(data_url)
+    df = pd.read_csv(data_url)
     X = df.drop(y, axis=1)
     y = df[y]
     return X, y
@@ -93,11 +106,14 @@ def select_cols():
         y = df[y_col]
         ols_results = ols_tm(X.astype(float), y)
         ols_summary = Markup(ols_results)
-
+        model_comparison_dict = {}
+        models = ['Linear Regression', 'Random Forest', 'Gradient Boosting', 'K Neighbors', 'S V R', 'Elastic Net']
         return flask.render_template(
                                 'cols4.html',
                                 head = head,
+                                models = models,
                                 columns = columns,
+                                model_comparison_dict = model_comparison_dict,
                                 ols_summary = ols_summary
                                 )
     elif request.method=='GET':
@@ -107,12 +123,16 @@ def select_cols():
 
 @app.route('/regressions', methods=["POST"])
 def regressions():
-    data_url = '../data/df_reduced_cols.csv'
-    y = global y
+    # X_url = '../data/df_X_new_names.csv'
+    # y_url = '../data/df_y_new_names.csv'
+    # X_url = 0
+    # y_url = 0
     selected_models = list(request.form.keys())
-    model_comparison_dict = compare_models(data_url, y, selected_models)
-
-    return jsonify(model_comparison_dict = model_comparison_dict)
+    print('selected_models: ', selected_models)
+    # model_comparison_dict = compare_models(X_url, y_url, selected_models)
+    model_comparison_dict = {'SVR': [1, 2, 3], 'Random Forest': [11, 22, 33]}
+    html_string = build_regression_results_table(model_comparison_dict)
+    return html_string
 
 @app.route('/ols', methods=["POST"])
 def ols():
@@ -137,7 +157,7 @@ def process():
     print('new columns:', new_columns)
 
     new_head = print_head(df)
-    df.to_csv('../data/df_reduced_cols.csv')
+    df.to_csv('../data/df_new_col_names.csv')
     print('new_head', new_head)
     return jsonify(result = new_head)
 

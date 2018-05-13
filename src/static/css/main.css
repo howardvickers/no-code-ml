@@ -15,7 +15,11 @@
   max-width: 100%;
 }
 
-  
+.jumbotron
+{
+  height: 300px;
+}
+
 @import url();
 
 

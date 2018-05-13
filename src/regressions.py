@@ -27,7 +27,7 @@ def eval_model(model, X_train, y_train, X_test, y_test):
 
     return rmse_train, rmse_test
 
-def run_models(X, y):
+def run_models(X, y, models):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=123)
 
     hyperpara_dict = {  LR  : {}, # use defaults only
