@@ -26,6 +26,10 @@ The web app offers/will offer the following functionality:
 * save resulting datasets and regression analyses
 * manually delete all saved files at end of session
 
+### Structure
+* [app.py](https://github.com/howardvickers/no-code-ml/blob/master/src/app.py) is the server.  
+* [regressions.py](https://github.com/howardvickers/no-code-ml/blob/master/src/regressions.py) runs regressions according to selected models and returns RMSE and R-Squared stats.   
+
 ### Technologies Employed
 * python
 * numpy
