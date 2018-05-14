@@ -43,6 +43,24 @@
    </script>
    <script>
       $(document).ready(function(){
+        // var oForm_upload = document.forms["form_upload"];
+          $("#btn_upload").click(function(e){
+              e.preventDefault();
+              var upload_data = new FormData($('#upload')[0]);
+              $.ajax({
+                data: upload_data,
+                type : 'POST',
+                url : '/uploadcsv',
+                processData: false,
+                success: function(data){
+                  $("#firsthead").html(data.first_head);
+              }
+            });
+          });
+      });
+   </script>
+   <script>
+      $(document).ready(function(){
         var oForm2 = document.forms["form2"];
           $("#button2").click(function(e){
               e.preventDefault();
@@ -52,13 +70,7 @@
                 type : 'POST',
                 url : '/regressions',
                 success: function(data){
-                  // var obj = JSON.parse('{ "name":"John", "age":30, "city":"New York"}');
-
-                  // var obj = jQuery.parseJSON( data );
-                  // alert( obj.test_k === "John" );
-                  // var obj = JSON.parse(data)
                   console.log('the data:',  data)
-                  // console.log('the data:',  data.theresults)
                   $("#theresults").html(data);
               }
             })
@@ -85,6 +97,53 @@
    <div class="container">
       <div class="">
          <div class="jumbotron" style="overflow-x:scroll; white-space: nowrap;">
+            <form id="upload" name="form_upload" enctype="multipart/form-data" method="post" action="/uploadcsv">
+               <div class="col">
+                  <input type="file" name="data_file" />
+                  <button id="btn_upload" type="submit" class="btn btn-primary" >Upload</button>
+               </div>
+            </form>
+         </div>
+      </div>
+      <div class="">
+         <div class="jumbotron" style="overflow-x:scroll; overflow-y:scroll; white-space: nowrap;">
+            <h3>Summary of Uploaded Data</h3>
+            <div class="table table-hover">
+               <div id="firsthead">
+                  {{firsthead}}
+               </div>
+            </div>
+         </div>
+      </div>
+      <div class="">
+         <div class="jumbotron" style="overflow-x:scroll; overflow-y:scroll; white-space: nowrap;">
+            <h3>Select Columns</h3>
+            <form action='/select_cols', method='POST'>
+               <table class="table table-hover">
+                  <thead>
+                     <tr>
+                        <th scope="col">Column</th>
+                        <th scope="col">Include</th>
+                        <th scope="col">Y Column</th>
+                     </tr>
+                  </thead>
+                  <tbody>
+                     {% for col in columns %}
+                     <tr>
+                        <td>{{col}}</td>
+                        <!-- <td ><input id="checkBox_{{columns.index(col)}}" type="text" name="{{col}}" placeholder="New Column Name"></td> -->
+                        <td class="radio-inline"><input id="checkBox_{{columns.index(col)}}" type="radio" name="{{col}}" value="keep"/></td>
+                        <td class="radio-inline"><input id="checkBox_{{columns.index(col)}}" type="radio" name="{{col}}" value="y"/></td>
+                     </tr>
+                  </tbody>
+                  {% endfor %}
+               </table>
+               <button type="submit" value="submit"class="btn btn-primary" >Submit</button>
+            </form>
+         </div>
+      </div>
+      <div class="">
+         <div class="jumbotron" style="overflow-x:scroll; white-space: nowrap;">
             <h3>Rename Columns</h3>
             <form name="form3" action="/change_col_names">
                <table class="table table-hover">
@@ -103,6 +162,7 @@
                         </td>
                      </tr>
                      {% endfor %}
+                  </tbody>
                </table>
                <button id="button3" type="submit" class="btn btn-primary" >Rename Columns</button>
             </form>
@@ -119,7 +179,7 @@
       </div>
       <div class="row">
          <div class="col-sm-5">
-           <div class="jumbotron" style="overflow-x:scroll; overflow-y:scroll; white-space: nowrap;">
+            <div class="jumbotron" style="overflow-x:scroll; overflow-y:scroll; white-space: nowrap;">
                <h3>Run Regressions</h3>
                <form name="form2" action="/regressions">
                   <table class="table table-hover">
@@ -148,7 +208,6 @@
                <h3>Regression Results</h3>
                <div id="theresults">
                </div>
-
             </div>
          </div>
       </div>

@@ -21,22 +21,24 @@ def calc_rmse(yhat, y):
 def eval_model(model, X_train, y_train, X_test, y_test):
     ypred = model.predict(X_test)
     ytrainpred = model.predict(X_train)
-    r2score = r2_score(y_test, pred)
-    rmse_train  = calc_rmse(ytrainpred, y_train)
-    rmse_test   = calc_rmse(ypred, y_test)
+    r2score = round(r2_score(y_test, ypred), 2)
+    rmse_train  = round(calc_rmse(ytrainpred, y_train), 2)
+    rmse_test   = round(calc_rmse(ypred, y_test), 2)
 
-    return rmse_train, rmse_test
+    return rmse_train, rmse_test, r2score
 
 def run_models(X, y, models):
+    print('models within run_models:', models)
+
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=123)
 
     hyperpara_dict = {  LR  : {}, # use defaults only
-                        RFR : { 'randomforestregressor__max_features' : ['auto', 'sqrt'],
-                                'randomforestregressor__max_depth': [10, None],
-                                'randomforestregressor__bootstrap': [True, False],
+                        RFR : { 'randomforestregressor__max_features' : ['auto'],
+                                'randomforestregressor__max_depth': [10],
+                                'randomforestregressor__bootstrap': [True],
                                 'randomforestregressor__min_samples_leaf': [1, 4],
                                 'randomforestregressor__min_samples_split': [2, 5],
-                                'randomforestregressor__n_estimators': [10, 100],
+                                'randomforestregressor__n_estimators': [10],
                                 },
                         GBR : { 'gradientboostingregressor__n_estimators' :     [100],
                                 'gradientboostingregressor__max_depth':         [5, 10],
@@ -57,9 +59,14 @@ def run_models(X, y, models):
                                 }
                         }
 
-    models = [LR, RFR, GBR, KNR, SVR, EN]
+    model_names_dict = {'Linear Regression': LR, 'Random Forest': RFR, 'Gradient Boosting': GBR, 'K Neighbors': KNR, 'S V R': SVR, 'Elastic Net': EN}
 
-    for model in models:
+    model_comparison_dict = {}
+
+    for model_name in models:
+        model = model_names_dict[model_name]
+
+        print('model in run_models:', model)
 
         # data preprocessing (removing mean and scaling to unit variance with StandardScaler)
         pipeline = make_pipeline(   StandardScaler(),
@@ -75,7 +82,7 @@ def run_models(X, y, models):
         print('best params for {}:'.format(model), clf.best_params_)
         r2score, rmse_train, rmse_test = eval_model(clf.best_estimator_, X_train, y_train, X_test, y_test)
 
-        model_comparison_dict[model] = r2score, rmse_train, rmse_test
+        model_comparison_dict[model_name] = r2score, rmse_train, rmse_test
 
     return model_comparison_dict
 

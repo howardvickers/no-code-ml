@@ -1,3 +1,4 @@
+import global_y
 from flask import Flask, make_response, request, render_template, jsonify
 from flask_bootstrap import Bootstrap
 from flask import Markup
@@ -34,27 +35,49 @@ def drop_unnamed_col(df):
             df.drop(col, axis=1, inplace=True)
     return df
 
-def compare_models(data_url, y, models):
+def compare_models(data_url, y_name, models):
     """passes list of models to compare to GridSearchCV in rm(); returns model_comparison_dict"""
-    # X, y = get_X_y(data_url, y)
-    X = 0
-    y = 0
-    models = []
+    # X, y = get_X_y(data_url, y_name)
+    df = pd.read_csv(data_url)
+    X = df.drop(y_name, axis=1)
+    y = df[y_name]
     model_comparison_dict = rm(X, y, models)
+    print('X.head(), y.head(), models: ', X.head(), y.head(), models)
     return model_comparison_dict
 
-def get_X_y(data_url, y):
+def get_X_y(data_url, y_name):
     """reloads data as csv and separates into two dataframes (X, y); returns X, y"""
     df = pd.read_csv(data_url)
-    X = df.drop(y, axis=1)
-    y = df[y]
+    X = df.drop(y_name, axis=1)
+    y = df[y_name]
     return X, y
 
 app = Flask(__name__)
 
+@app.route('/ml.html')
+def ml():
+    return flask.render_template('ml.html')
+
 @app.route('/upload.html')
 def upload():
     return flask.render_template('upload.html')
+
+# @app.route('/uploadcsv', methods=["POST"])
+# def uploadcsv():
+#     print('hello uploadcsv')
+#     print('type (request)', type (request.files['data_file']))
+#     f = request.files['data_file']
+#     if not f:
+#         return "No file"
+#     df = pd.read_csv(f)
+#     print('df.head(): ', df.head())
+#     df.to_csv('../data/df.csv')
+#     head1 = print_head(df)
+#     print('the head', head1)
+#     columns = list(df.columns)
+#
+#     return jsonify(first_head = head1)
+
 
 @app.route('/head', methods=["POST"])
 def head():
@@ -67,8 +90,8 @@ def head():
     columns = list(df.columns)
 
     return flask.render_template(
-                                'head.html',
-                                head = head,
+                                'ml.html',
+                                firsthead = head,
                                 columns = columns
                                 )
 
@@ -81,35 +104,38 @@ def select_cols():
         form_results = request.form
         print('input from form (select cols): ', request.form)
         cols_to_keep = list(form_results.keys())
-        x_cols = cols_to_keep.copy()
+        cols_to_keep_less_y = cols_to_keep.copy()
         print('This is cols_to_keep:', cols_to_keep)
-        print('This is x_cols: ', x_cols)
+        print('This is cols_to_keep_less_y (still with y): ', cols_to_keep_less_y)
         for k, v in form_results.items():
             print('This is k', k)
             print('This is v', v)
             if v == 'y':
-                x_cols.remove(k)
-                y_col = k
-                print('This is y_col', y_col)
-        print('Now here is cols_to_keep', cols_to_keep)
-        print('Now here is x_cols', x_cols)
-        print('This is again y_col', y_col)
+                global_y.y_col_name = k
+                cols_to_keep_less_y.remove(k)
+                print('This is global_y.y_col_name:', global_y.y_col_name)
+        print('Now here is cols_to_keep (without "y"):', cols_to_keep_less_y)
+        # print('Now here is x_cols', global_y.X_col_names)
+        # print('This is again y_col', global_y.y_col_name)
         cols_to_drop = set(all_cols) - set(cols_to_keep)
-        new_df = df.drop(cols_to_drop, axis=1)
-        print('Here is new_df', new_df)
-        print('new_df.columns', new_df.columns)
-        df_X = new_df.drop(y_col, axis=1)
-        head = print_head(new_df)
-        new_df.to_csv('../data/df_reduced_cols.csv')
-        columns = list(new_df.columns)
+        print('cols_to_drop:', cols_to_drop)
+        df_reduced_cols = df.drop(cols_to_drop, axis=1)
+        print('Here is df_reduced_cols', df_reduced_cols)
+        print('df_reduced_cols.columns', df_reduced_cols.columns)
+        df_X = df_reduced_cols.drop(global_y.y_col_name, axis=1)
+        head = print_head(df_reduced_cols)
+        df_reduced_cols.to_csv('../data/df_reduced_cols.csv')
+        columns = list(df_reduced_cols.columns)
         X = df_X
-        y = df[y_col]
+        y = df[global_y.y_col_name]
+        # X.to_csv('../data/df_X_new_names.csv')
+        # y.to_csv('../data/df_y_new_names.csv')
         ols_results = ols_tm(X.astype(float), y)
         ols_summary = Markup(ols_results)
         model_comparison_dict = {}
         models = ['Linear Regression', 'Random Forest', 'Gradient Boosting', 'K Neighbors', 'S V R', 'Elastic Net']
         return flask.render_template(
-                                'cols4.html',
+                                'ml.html',
                                 head = head,
                                 models = models,
                                 columns = columns,
@@ -121,45 +147,38 @@ def select_cols():
     else:
         return("ok")
 
-@app.route('/regressions', methods=["POST"])
-def regressions():
-    # X_url = '../data/df_X_new_names.csv'
-    # y_url = '../data/df_y_new_names.csv'
-    # X_url = 0
-    # y_url = 0
-    selected_models = list(request.form.keys())
-    print('selected_models: ', selected_models)
-    # model_comparison_dict = compare_models(X_url, y_url, selected_models)
-    model_comparison_dict = {'SVR': [1, 2, 3], 'Random Forest': [11, 22, 33]}
-    html_string = build_regression_results_table(model_comparison_dict)
-    return html_string
-
-@app.route('/ols', methods=["POST"])
-def ols():
-    pass
-
-@app.route('/process', methods=['POST'])
-def process():
-    # if request.method=='POST':
+@app.route('/change_col_names', methods=['POST'])
+def change_col_names():
     df = pd.read_csv('../data/df_reduced_cols.csv')
 
-    existing_cols = list(df.columns)
-    print('existing columns:', existing_cols)
-
+    print('Existing column names:', list(df.columns))
     form_results = request.form
     print('request.form: ', request.form)
     for k, v in form_results.items():
         print('k:', k)
         print('v:', v)
+        print('global_y.y_col_name:', global_y.y_col_name)
+        # print('global_y.X_col_names:', global_y.X_col_names)
         df.rename(columns={k: v}, inplace=True)
+        if k == global_y.y_col_name:
+            global_y.y_col_name = v
     df = drop_unnamed_col(df)
-    new_columns = list(df.columns)
-    print('new columns:', new_columns)
-
+    df.to_csv('../data/df_Xy_new_names.csv')
+    print('New column names:', list(df.columns))
     new_head = print_head(df)
-    df.to_csv('../data/df_new_col_names.csv')
-    print('new_head', new_head)
+    print('new_head:', new_head)
     return jsonify(result = new_head)
+
+@app.route('/regressions', methods=["POST"])
+def regressions():
+    data_url = '../data/df_Xy_new_names.csv'
+    selected_models = list(request.form.keys())
+    print('selected_models: ', selected_models)
+    model_comparison_dict = compare_models(data_url, global_y.y_col_name, selected_models)
+    print('model_comparison_dict from regressions.py:', model_comparison_dict)
+    # model_comparison_dict = {'SVR': [1, 2, 3], 'Random Forest': [11, 22, 33]}
+    html_string = build_regression_results_table(model_comparison_dict)
+    return html_string
 
 if __name__ == "__main__":
     Bootstrap(app)
