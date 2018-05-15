@@ -28,7 +28,7 @@ The web app offers/will offer the following functionality:
 
 ### Structure
 * [app.py](https://github.com/howardvickers/no-code-ml/blob/master/src/app.py) is the server.  
-* [ml.html](https://github.com/howardvickers/no-code-ml/blob/master/src/templates/ml.html) is the html page.  
+* [index.html](https://github.com/howardvickers/no-code-ml/blob/master/src/templates/ml.html) is the html page.  
 * [regressions.py](https://github.com/howardvickers/no-code-ml/blob/master/src/regressions.py) runs regressions according to selected models and returns RMSE and R-Squared stats.   
 
 ### Technologies Employed
