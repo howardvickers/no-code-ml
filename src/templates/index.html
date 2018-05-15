@@ -43,11 +43,11 @@
    </script>
    <script>
       $(document).ready(function(){
-        var upload_data = new FormData($('#upload')[0]);
-          $("#btn_upload").click(function(e){
+          $("#button").click(function(e){
+            console.log("click!")
             e.preventDefault();
               $.ajax({
-                data: upload_data,
+                data: new FormData($('#upload')[0]),
                 type : 'POST',
                 url : '/uploadcsv',
                 cache: false,
@@ -55,6 +55,14 @@
                 contentType: false,
                 success: function(d){
                   $("#firsthead").html(d.head_table);
+                },
+                error: function(err){
+                  console.log("error!")
+                  alert("error is: " + errorThrown);
+                },
+                complete: function(){
+                  console.log("complete!")
+                  alert("this is complete");
                 }
             });
           });
@@ -96,128 +104,28 @@
    <h1>Drag-n-Drop ML: <small>Code-Free Machine Learning</small></h1>
    </br>
    <div class="container">
-      <div class="">
-         <div class="jumbotron" style="overflow-x:scroll; white-space: nowrap;">
-            <form id="upload" name="form_upload" enctype="multipart/form-data" method="post" action="/uploadcsv">
-               <div class="col">
-                  <input type="file" name="data_file" />
-                  <button id="btn_upload" type="submit" class="btn btn-primary" >Upload</button>
-               </div>
-            </form>
-         </div>
-      </div>
-      <div class="">
-         <div class="jumbotron" style="overflow-x:scroll; overflow-y:scroll; white-space: nowrap;">
-            <h3>Summary of Uploaded Data</h3>
-            <div class="table table-hover">
-               <!-- <div id="firsthead">
-                  {{firsthead}}
-                  </div> -->
-            </div>
-         </div>
-      </div>
-      <div class="">
-         <div class="jumbotron" style="overflow-x:scroll; overflow-y:scroll; white-space: nowrap;">
-            <h3>Select Columns</h3>
-            <form action='/select_cols', method='POST'>
-               <table class="table table-hover">
-                  <thead>
-                     <tr>
-                        <th scope="col">Column</th>
-                        <th scope="col">Include</th>
-                        <th scope="col">Y Column</th>
-                     </tr>
-                  </thead>
-                  <tbody>
-                     {% for col in columns %}
-                     <tr>
-                        <td>{{col}}</td>
-                        <!-- <td ><input id="checkBox_{{columns.index(col)}}" type="text" name="{{col}}" placeholder="New Column Name"></td> -->
-                        <td class="radio-inline"><input id="checkBox_{{columns.index(col)}}" type="radio" name="{{col}}" value="keep"/></td>
-                        <td class="radio-inline"><input id="checkBox_{{columns.index(col)}}" type="radio" name="{{col}}" value="y"/></td>
-                     </tr>
-                  </tbody>
-                  {% endfor %}
-               </table>
-               <button type="submit" value="submit"class="btn btn-primary" >Submit</button>
-            </form>
-         </div>
-      </div>
-      <div class="">
-         <div class="jumbotron" style="overflow-x:scroll; white-space: nowrap;">
-            <h3>Rename Columns</h3>
-            <form name="form3" action="/change_col_names">
-               <table class="table table-hover">
-                  <thead>
-                     <tr>
-                        <th scope="col">Old Name</th>
-                        <th scope="col">New Name</th>
-                     </tr>
-                  </thead>
-                  <tbody>
-                     {% for col in columns %}
-                     <tr>
-                        <td>{{col}}</td>
-                        <td>
-                           <input type="text" name="{{col}}" placeholder="New Column Name">
-                        </td>
-                     </tr>
-                     {% endfor %}
-                  </tbody>
-               </table>
-               <button id="button3" type="submit" class="btn btn-primary" >Rename Columns</button>
-            </form>
-         </div>
-      </div>
-      <div class="">
-         <div class="jumbotron" style="overflow-x:scroll; overflow-y:scroll; white-space: nowrap;">
-            <h3>Table Summary with New Column Names</h3>
-            <div class="table table-hover">
-               <!-- <div id="result"> -->
-               <div id="firsthead">
-               </div>
-            </div>
-         </div>
-      </div>
-      <div class="row">
-         <div class="col-sm-5">
-            <div class="jumbotron" style="overflow-x:scroll; overflow-y:scroll; white-space: nowrap;">
-               <h3>Run Regressions</h3>
-               <form name="form2" action="/regressions">
-                  <table class="table table-hover">
-                     <thead>
-                        <tr>
-                           <th scope="col">Model</th>
-                           <th scope="col">Select</th>
-                        </tr>
-                     </thead>
-                     <tbody>
-                        {% for model in models %}
-                        <tr>
-                           <td>{{model.title()}}</td>
-                           <td>
-                              <input type="checkbox" name="{{model}}" checked>
-                           </td>
-                        </tr>
-                        {% endfor %}
-                  </table>
-                  <button id="button2" type="submit" class="btn btn-primary" >Run Regressions</button>
-               </form>
-            </div>
-         </div>
-         <div class="col-sm-7">
-            <div class="jumbotron" style="overflow-x:scroll; overflow-y:scroll; white-space: nowrap;">
-               <h3>Regression Results</h3>
-               <div id="theresults">
-               </div>
-            </div>
-         </div>
-      </div>
+     <div class="">
+        <div class="jumbotron" style="overflow-x:scroll; white-space: nowrap;">
+           <form id="upload" name="form_upload" enctype="multipart/form-data" method="post" action="/uploadcsv">
+              <div class="col">
+                 <input type="file" name="data_file" />
+                 <button id="btn_upload" type="submit" class="btn btn-primary" >Upload</button>
+              </div>
+           </form>
+        </div>
+     </div>
+     <div class="">
+        <div class="jumbotron" style="overflow-x:scroll; white-space: nowrap;">
+          <div id="firsthead">
+            This is... {{firsthead}}
+          </div>
+        </div>
+     </div>
    </div>
 </div>
 <footer class="footer">
    <div class="container" align="center">
-      <a href="https://github.com/howardvickers/" class="btn btn-social-icon btn-github btn-small"><i class="fa fa-github fa-3x"></i></a>
+      <a href="https://github.com/howardvickers/no-code-ml" class="btn btn-social-icon btn-github btn-small"><i class="fa fa-github fa-3x"></i></a>
       <a href="https://linkedin.com/in/howardvickers/" class="btn btn-social-icon btn-linkedin btn-small"><i class="fa fa-linkedin fa-3x"></i></a>
       </p>
    </div>

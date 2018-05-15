@@ -24,12 +24,11 @@
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
    <link href="{{ url_for('static', filename='css/jquery-3.3.1.min.js') }}" rel="stylesheet">
    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-
-
    <script>
       $(document).ready(function(){
         var oForm3 = document.forms["form3"];
           $("#button3").click(function(e){
+            console.log("yay change names!")
               e.preventDefault();
               var dataResults = $(oForm3).serializeArray();
               $.ajax({
@@ -37,27 +36,52 @@
                 type : 'POST',
                 url : '/change_col_names',
                 success: function(data){
-                  $("#result").html(data.result);
+                  console.log('the newcolhead data:',  data.newcolhead)
+                  $("#newcolshead").html(data.newcolhead);
               }
             })
           });
       });
    </script>
+
    <script>
       $(document).ready(function(){
-        // var oForm_upload = document.forms["form_upload"];
-          $("#button").click(function(e){
+        var oForm4 = document.forms["form4"];
+          $("#button4").click(function(e){
               e.preventDefault();
-              var upload_data = new FormData($('#upload')[0]);
+              var newcolsData = $(oForm4).serializeArray();
               $.ajax({
-                data: upload_data,
+                data: newcolsData,
+                type : 'POST',
+                url : '/select_cols',
+                success: function(data){
+                  console.log('the newcols data:',  data.columns)
+                  console.log('the firsthead1 data:',  data.firsthead1)
+                  console.log('the newhead data:',  data.newhead)
+                  $("#newcols").html(data.columns);
+                  $("#newhead").html(data.newhead);
+                  $("#firsthead1").html(data.firsthead1);
+              }
+            })
+          });
+      });
+   </script>
+
+   <script>
+      $(document).ready(function(){
+          $("#button").click(function(e){
+            console.log("yay upload!")
+            e.preventDefault();
+              $.ajax({
+                data: new FormData($('#upload')[0]),
                 type : 'POST',
                 url : '/uploadcsv',
-                contentType: "application/json",
+                cache: false,
                 processData: false,
-                success: function(data){
-                  $("#firsthead").html(data.first_head);
-              }
+                contentType: false,
+                success: function(d){
+                  $("#firsthead").html(d.head_table);
+                }
             });
           });
       });
@@ -66,7 +90,8 @@
       $(document).ready(function(){
         var oForm2 = document.forms["form2"];
           $("#button2").click(function(e){
-              e.preventDefault();
+            console.log("yay regressions!")
+            e.preventDefault();
               var models = $(oForm2).serializeArray();
               $.ajax({
                 data: models,
@@ -80,8 +105,6 @@
           });
       });
    </script>
-
-
 </head>
 {% endblock %}
 {% block content %}
@@ -99,35 +122,20 @@
 <div class="page-header">
    <h1>Drag-n-Drop ML: <small>Code-Free Machine Learning</small></h1>
    </br>
-
-        <div class="container">
-           <div class="">
-         <div class="jumbotron" style="overflow-x:scroll; white-space: nowrap;">
-            <form id="upload" name="form_upload" enctype="multipart/form-data" method="post" action="/uploadcsv">
-               <div class="col">
-                  <input type="file" name="data_file" />
-                  <button id="btn_upload" type="submit" class="btn btn-primary" >Upload</button>
-               </div>
-            </form>
-
-
-
-         </div>
-      </div>
+   <div class="container">
       <div class="">
          <div class="jumbotron" style="overflow-x:scroll; overflow-y:scroll; white-space: nowrap;">
             <h3>Summary of Uploaded Data</h3>
             <div class="table table-hover">
-               <div id="firsthead">
-                  {{firsthead}}
-               </div>
+              {{firsthead}}
             </div>
          </div>
       </div>
       <div class="">
          <div class="jumbotron" style="overflow-x:scroll; overflow-y:scroll; white-space: nowrap;">
             <h3>Select Columns</h3>
-            <form action='/select_cols', method='POST'>
+            <form name="form4" action="/change_col_names">
+            <!-- <form action='/select_cols', method='POST'> -->
                <table class="table table-hover">
                   <thead>
                      <tr>
@@ -140,14 +148,14 @@
                      {% for col in columns %}
                      <tr>
                         <td>{{col}}</td>
-                        <!-- <td ><input id="checkBox_{{columns.index(col)}}" type="text" name="{{col}}" placeholder="New Column Name"></td> -->
                         <td class="radio-inline"><input id="checkBox_{{columns.index(col)}}" type="radio" name="{{col}}" value="keep"/></td>
                         <td class="radio-inline"><input id="checkBox_{{columns.index(col)}}" type="radio" name="{{col}}" value="y"/></td>
                      </tr>
                   </tbody>
                   {% endfor %}
                </table>
-               <button type="submit" value="submit"class="btn btn-primary" >Submit</button>
+               <button id="button4" type="submit" class="btn btn-primary" >Select Columns</button>
+               <!-- <button type="submit" value="submit"class="btn btn-primary" >Submit</button> -->
             </form>
          </div>
       </div>
@@ -155,7 +163,10 @@
          <div class="jumbotron" style="overflow-x:scroll; white-space: nowrap;">
             <h3>Rename Columns</h3>
             <form name="form3" action="/change_col_names">
-               <table class="table table-hover">
+              <div id="newcols">
+              </div>
+
+               <!-- <table class="table table-hover">
                   <thead>
                      <tr>
                         <th scope="col">Old Name</th>
@@ -163,7 +174,7 @@
                      </tr>
                   </thead>
                   <tbody>
-                     {% for col in columns %}
+                     {% for col in new_columns %}
                      <tr>
                         <td>{{col}}</td>
                         <td>
@@ -172,7 +183,7 @@
                      </tr>
                      {% endfor %}
                   </tbody>
-               </table>
+               </table> -->
                <button id="button3" type="submit" class="btn btn-primary" >Rename Columns</button>
             </form>
          </div>
@@ -181,7 +192,8 @@
          <div class="jumbotron" style="overflow-x:scroll; overflow-y:scroll; white-space: nowrap;">
             <h3>Table Summary with New Column Names</h3>
             <div class="table table-hover">
-               <div id="result">
+              <!-- <div id="result"> -->
+                <div id="newcolshead">
                </div>
             </div>
          </div>
@@ -219,12 +231,21 @@
                </div>
             </div>
          </div>
+         <div class="col-sm-7">
+            <div class="jumbotron" style="overflow-x:scroll; overflow-y:scroll; white-space: nowrap;">
+               <h3>firsthead1</h3>
+               <div id="firsthead1">
+               </div>
+                 <!-- <div id="newcols">
+
+               </div> -->
+         </div>
       </div>
    </div>
 </div>
 <footer class="footer">
    <div class="container" align="center">
-      <a href="https://github.com/howardvickers/" class="btn btn-social-icon btn-github btn-small"><i class="fa fa-github fa-3x"></i></a>
+      <a href="https://github.com/howardvickers/no-code-ml" class="btn btn-social-icon btn-github btn-small"><i class="fa fa-github fa-3x"></i></a>
       <a href="https://linkedin.com/in/howardvickers/" class="btn btn-social-icon btn-linkedin btn-small"><i class="fa fa-linkedin fa-3x"></i></a>
       </p>
    </div>

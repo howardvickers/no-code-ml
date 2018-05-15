@@ -21,6 +21,17 @@ def build_regression_results_table(dict):
         mid_rows += row
     return top+mid_rows+bottom
 
+
+def build_cols_rename_table(list):
+    top = '<table class="table table-hover"><thead><tr><th scope="col">Old Name</th><th scope="col">New Name</th></tr></thead><tbody>'
+    middle = '<tr> <td>{}</td> <td><input type="text" name="{}" placeholder="New Column Name"></td></tr>'
+    bottom =   '</tbody></table>'
+    mid_rows = ""
+    for col in list:
+        row = middle.format(col, col)
+        mid_rows += row
+    return top+mid_rows+bottom
+
 def print_head(df):
     """converts pandas 'head' to html; returns html"""
     head = df.head().to_html()
@@ -55,12 +66,12 @@ def compare_models(data_url, y_name, models):
 app = Flask(__name__)
 
 @app.route('/')
-def ml():
+def index():
     return flask.render_template('index.html')
 
-@app.route('/upload')
-def upload():
-    return flask.render_template('upload.html')
+# @app.route('/upload')
+# def upload():
+#     return flask.render_template('upload.html')
 
 @app.route('/uploadcsv', methods=["POST"])
 def uploadcsv():
@@ -75,7 +86,23 @@ def uploadcsv():
     head1 = print_head(df)
     print('the head', head1)
     columns = list(df.columns)
-    return jsonify(head_table = head1)
+    # resp = flask.make_response(jsonify(head_table = head1), 200)
+    # resp.mimetype = "text/javascript"
+    # return resp
+
+
+
+    # return flask.jsonify(head_table = head1)
+
+    # return ("{'head_table': 'testv'}")
+    models = ['Linear Regression', 'Random Forest', 'Gradient Boosting', 'K Neighbors', 'S V R', 'Elastic Net']
+
+    return flask.render_template(
+                                'ml.html',
+                                firsthead = head1,
+                                columns = columns,
+                                models = models
+                                )
 
 
 # @app.route('/head', methods=["POST"])
@@ -99,6 +126,7 @@ def select_cols():
     if request.method == 'POST':
         y_col = ''
         df = pd.read_csv('../data/df.csv')
+        head1 = print_head(df)
         all_cols = list(df.columns)
         form_results = request.form
         print('input from form (select cols): ', request.form)
@@ -123,20 +151,24 @@ def select_cols():
         head = print_head(df_reduced_cols)
         df_reduced_cols.to_csv('../data/df_reduced_cols.csv')
         columns = list(df_reduced_cols.columns)
+        html_cols = build_cols_rename_table(columns)
         X = df_X
         y = df[global_y.y_col_name]
         ols_results = ols_tm(X.astype(float), y)
         ols_summary = Markup(ols_results)
         model_comparison_dict = {}
         models = ['Linear Regression', 'Random Forest', 'Gradient Boosting', 'K Neighbors', 'S V R', 'Elastic Net']
-        return flask.render_template(
-                                'ml.html',
-                                head = head,
+        return flask.jsonify(
+                                newhead = head,
+                                firsthead1 = head1,
                                 models = models,
-                                columns = columns,
+                                columns = html_cols,
                                 model_comparison_dict = model_comparison_dict,
                                 ols_summary = ols_summary
                                 )
+
+        # return html_cols
+
     elif request.method=='GET':
         return "OK this is a GET method"
     else:
@@ -161,7 +193,7 @@ def change_col_names():
     print('New column names:', list(df.columns))
     new_head = print_head(df)
     print('new_head:', new_head)
-    return jsonify(result = new_head)
+    return jsonify(newcolhead = new_head)
 
 @app.route('/regressions', methods=["POST"])
 def regressions():
