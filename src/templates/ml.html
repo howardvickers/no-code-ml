@@ -24,6 +24,8 @@
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
    <link href="{{ url_for('static', filename='css/jquery-3.3.1.min.js') }}" rel="stylesheet">
    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+
+
    <script>
       $(document).ready(function(){
         var oForm3 = document.forms["form3"];
@@ -44,13 +46,14 @@
    <script>
       $(document).ready(function(){
         // var oForm_upload = document.forms["form_upload"];
-          $("#btn_upload").click(function(e){
+          $("#button").click(function(e){
               e.preventDefault();
               var upload_data = new FormData($('#upload')[0]);
               $.ajax({
                 data: upload_data,
                 type : 'POST',
                 url : '/uploadcsv',
+                contentType: "application/json",
                 processData: false,
                 success: function(data){
                   $("#firsthead").html(data.first_head);
@@ -77,6 +80,8 @@
           });
       });
    </script>
+
+
 </head>
 {% endblock %}
 {% block content %}
@@ -94,8 +99,9 @@
 <div class="page-header">
    <h1>Drag-n-Drop ML: <small>Code-Free Machine Learning</small></h1>
    </br>
-   <div class="container">
-      <div class="">
+
+        <div class="container">
+           <div class="">
          <div class="jumbotron" style="overflow-x:scroll; white-space: nowrap;">
             <form id="upload" name="form_upload" enctype="multipart/form-data" method="post" action="/uploadcsv">
                <div class="col">
@@ -103,6 +109,9 @@
                   <button id="btn_upload" type="submit" class="btn btn-primary" >Upload</button>
                </div>
             </form>
+
+
+
          </div>
       </div>
       <div class="">

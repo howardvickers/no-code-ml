@@ -45,55 +45,54 @@ def compare_models(data_url, y_name, models):
     print('X.head(), y.head(), models: ', X.head(), y.head(), models)
     return model_comparison_dict
 
-def get_X_y(data_url, y_name):
-    """reloads data as csv and separates into two dataframes (X, y); returns X, y"""
-    df = pd.read_csv(data_url)
-    X = df.drop(y_name, axis=1)
-    y = df[y_name]
-    return X, y
+# def get_X_y(data_url, y_name):
+#     """reloads data as csv and separates into two dataframes (X, y); returns X, y"""
+#     df = pd.read_csv(data_url)
+#     X = df.drop(y_name, axis=1)
+#     y = df[y_name]
+#     return X, y
 
 app = Flask(__name__)
 
-@app.route('/ml.html')
+@app.route('/')
 def ml():
-    return flask.render_template('ml.html')
+    return flask.render_template('index.html')
 
-@app.route('/upload.html')
+@app.route('/upload')
 def upload():
     return flask.render_template('upload.html')
 
-# @app.route('/uploadcsv', methods=["POST"])
-# def uploadcsv():
-#     print('hello uploadcsv')
-#     print('type (request)', type (request.files['data_file']))
-#     f = request.files['data_file']
-#     if not f:
-#         return "No file"
-#     df = pd.read_csv(f)
-#     print('df.head(): ', df.head())
-#     df.to_csv('../data/df.csv')
-#     head1 = print_head(df)
-#     print('the head', head1)
-#     columns = list(df.columns)
-#
-#     return jsonify(first_head = head1)
-
-
-@app.route('/head', methods=["POST"])
-def head():
+@app.route('/uploadcsv', methods=["POST"])
+def uploadcsv():
+    print('hello uploadcsv')
+    print('type (request)', type (request.files['data_file']))
     f = request.files['data_file']
     if not f:
         return "No file"
     df = pd.read_csv(f)
+    print('df.head(): ', df.head())
     df.to_csv('../data/df.csv')
-    head = print_head(df)
+    head1 = print_head(df)
+    print('the head', head1)
     columns = list(df.columns)
+    return jsonify(head_table = head1)
 
-    return flask.render_template(
-                                'ml.html',
-                                firsthead = head,
-                                columns = columns
-                                )
+
+# @app.route('/head', methods=["POST"])
+# def head():
+#     f = request.files['data_file']
+#     if not f:
+#         return "No file"
+#     df = pd.read_csv(f)
+#     df.to_csv('../data/df.csv')
+#     head = print_head(df)
+#     columns = list(df.columns)
+#
+#     return flask.render_template(
+#                                 'ml.html',
+#                                 firsthead = head,
+#                                 columns = columns
+#                                 )
 
 @app.route('/select_cols', methods=["POST", "GET"])
 def select_cols():
@@ -115,8 +114,6 @@ def select_cols():
                 cols_to_keep_less_y.remove(k)
                 print('This is global_y.y_col_name:', global_y.y_col_name)
         print('Now here is cols_to_keep (without "y"):', cols_to_keep_less_y)
-        # print('Now here is x_cols', global_y.X_col_names)
-        # print('This is again y_col', global_y.y_col_name)
         cols_to_drop = set(all_cols) - set(cols_to_keep)
         print('cols_to_drop:', cols_to_drop)
         df_reduced_cols = df.drop(cols_to_drop, axis=1)
@@ -128,8 +125,6 @@ def select_cols():
         columns = list(df_reduced_cols.columns)
         X = df_X
         y = df[global_y.y_col_name]
-        # X.to_csv('../data/df_X_new_names.csv')
-        # y.to_csv('../data/df_y_new_names.csv')
         ols_results = ols_tm(X.astype(float), y)
         ols_summary = Markup(ols_results)
         model_comparison_dict = {}
@@ -158,7 +153,6 @@ def change_col_names():
         print('k:', k)
         print('v:', v)
         print('global_y.y_col_name:', global_y.y_col_name)
-        # print('global_y.X_col_names:', global_y.X_col_names)
         df.rename(columns={k: v}, inplace=True)
         if k == global_y.y_col_name:
             global_y.y_col_name = v
@@ -176,7 +170,6 @@ def regressions():
     print('selected_models: ', selected_models)
     model_comparison_dict = compare_models(data_url, global_y.y_col_name, selected_models)
     print('model_comparison_dict from regressions.py:', model_comparison_dict)
-    # model_comparison_dict = {'SVR': [1, 2, 3], 'Random Forest': [11, 22, 33]}
     html_string = build_regression_results_table(model_comparison_dict)
     return html_string
 
