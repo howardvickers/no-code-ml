@@ -7,7 +7,7 @@
    <meta name="description" content="">
    <meta name="author" content="">
    <!-- Page title -->
-   <title>Drag-n-Drop - drag-n-drop-ml.com</title>
+   <title>No-Code ML: no-code-ml.com</title>
    <!-- Latest compiled and minified CSS -->
    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
@@ -24,6 +24,10 @@
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
    <link href="{{ url_for('static', filename='css/jquery-3.3.1.min.js') }}" rel="stylesheet">
    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+   <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+   <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+
+
    <!-- <script>
       $(document).ready(function(){
           $('#uploadBTN').on('click', function(){
@@ -209,7 +213,7 @@
 {% block content %}
 <div class="container">
 </br>
-<ul class="nav nav-tabs">
+<!-- <ul class="nav nav-tabs">
    <li role="presentation" class="active"><a href="/">Step 1: Upload</a></li>
    <li role="presentation"><a href="/data">Step 2: Select Columns</a></li>
    <li role="presentation"><a href="/models">Step 3: Rename Columns</a></li>
@@ -217,9 +221,9 @@
    <li role="presentation"><a href="/county">County</a></li>
    <li role="presentation"><a href="/state">State</a></li>
    <li role="presentation"><a href="/about">About/Contact</a></li>
-</ul>
+</ul> -->
 <div class="page-header">
-   <h1>Drag-n-Drop ML: <small>Code-Free Machine Learning</small></h1>
+   <h1>No-Code ML: <small>Code-Free Machine Learning</small></h1>
    </br>
    <!-- <div class="">
       <div class="jumbotron" style="overflow-x:scroll; white-space: nowrap;">
@@ -268,6 +272,7 @@
       <div class="">
          <div class="jumbotron" style="overflow-x:scroll; overflow-y:scroll; white-space: nowrap;">
             <h3>Select Columns</h3>
+            <h3><small>Select Multiple Columns to Include and Select a Single Dependent (Y) Variable</small></h3>
             <form name="form4" action="/change_col_names">
                <!-- <form action='/select_cols', method='POST'> -->
                <table class="table table-hover">
@@ -282,8 +287,12 @@
                      {% for col in columns %}
                      <tr>
                         <td>{{col}}</td>
-                        <td class="radio-inline"><input id="checkBox_{{columns.index(col)}}" type="radio" name="{{col}}" value="keep"/></td>
-                        <td class="radio-inline"><input id="checkBox_{{columns.index(col)}}" type="radio" name="{{col}}" value="y"/></td>
+
+                        <td><input id="checkBox_{{columns.index(col)}}" type="checkbox" name="{{col}}" data-toggle="toggle" data-size="mini" value="keep" data-on="Include" data-off="Drop" /></td>
+                        <td><input id="checkBox_{{columns.index(col)}}" type="checkbox" name="{{col}}" data-toggle="toggle" data-size="mini" value="y" data-on="Dependent" data-off="Independent" /></td>
+
+                        <!-- <td class="radio-inline"><input id="checkBox_{{columns.index(col)}}" type="radio" name="{{col}}" value="keep"/></td> -->
+                        <!-- <td class="radio-inline"><input id="checkBox_{{columns.index(col)}}" type="radio" name="{{col}}" value="y"/></td> -->
                      </tr>
                   </tbody>
                   {% endfor %}
@@ -325,7 +334,6 @@
             <div class="table table-hover">
                <!-- <div id="result"> -->
                <div id="newcolshead">
-                  some text
                </div>
             </div>
          </div>
@@ -347,7 +355,7 @@
                         <tr>
                            <td>{{model.title()}}</td>
                            <td>
-                              <input type="checkbox" name="{{model}}" checked>
+                              <input type="checkbox" name="{{model}}" checked data-toggle="toggle" data-size="mini">
                            </td>
                         </tr>
                         {% endfor %}
