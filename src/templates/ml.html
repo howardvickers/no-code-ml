@@ -24,79 +24,74 @@
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
    <link href="{{ url_for('static', filename='css/jquery-3.3.1.min.js') }}" rel="stylesheet">
    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-
    <!-- <script>
-   $(document).ready(function(){
-       $('#uploadBTN').on('click', function(){
-           var fd = new FormData($("#fileinfo"));
-           //fd.append("CustomField", "This is some extra data");
-           $.ajax({
-               url: 'upload.php',
-               type: 'POST',
-               data: fd,
-               success:function(data){
-                   $('#output').html(data);
-               },
-               cache: false,
-               contentType: false,
-               processData: false
-           });
-       });
-   });
-</script> -->
-<script>
-$("#upload").submit(function(e) {
-  e.preventDefault();
-});
-   $(document).ready(function(){
-     var upload_data = new FormData($('#upload')[0]);
-     console.log('upload_data', upload_data)
-       $("#button").click(function(){
-         console.log('upload_data after click', upload_data);
-         // e.preventDefault();
-           $.ajax({
-             data: upload_data,
-             // console.log('data: upload_data', data),
-             type : 'POST',
-             url : '/uploadcsv',
-             cache: false,
-             processData: false,
-             contentType: false,
-             success: function(d){
-               console.log(d.head_table)
-               $("#firsthead").html(d.head_table);
-             }
-         });
-       });
-   });
-</script>
-
-<script>
-$(function() {
-  $('#upload_file_btn').click(function(e) {
-      console.log("yay upload web!")
-
-      var form_data = new FormData($('#upload_file')[0]);
-      console.log('this is form_data', form_data);
-      e.preventDefault();
-      $.ajax({
-          type: 'POST',
-          url: '/upload',
-          data: form_data,
-          contentType: false,
-          cache: false,
-          processData: false,
-          async: false,
-          success: function(data) {
-              console.log('Success!');
-          },
+      $(document).ready(function(){
+          $('#uploadBTN').on('click', function(){
+              var fd = new FormData($("#fileinfo"));
+              //fd.append("CustomField", "This is some extra data");
+              $.ajax({
+                  url: 'upload.php',
+                  type: 'POST',
+                  data: fd,
+                  success:function(data){
+                      $('#output').html(data);
+                  },
+                  cache: false,
+                  contentType: false,
+                  processData: false
+              });
+          });
       });
-  });
-});
-</script>
+      </script> -->
+   <script>
+      $("#upload").submit(function(e) {
+        e.preventDefault();
+      });
+         $(document).ready(function(){
+           var upload_data = new FormData($('#upload')[0]);
+           console.log('upload_data', upload_data)
+             $("#button").click(function(){
+               console.log('upload_data after click', upload_data);
+               // e.preventDefault();
+                 $.ajax({
+                   data: upload_data,
+                   // console.log('data: upload_data', data),
+                   type : 'POST',
+                   url : '/uploadcsv',
+                   cache: false,
+                   processData: false,
+                   contentType: false,
+                   success: function(d){
+                     console.log(d.head_table)
+                     $("#firsthead").html(d.head_table);
+                   }
+               });
+             });
+         });
+   </script>
+   <script>
+      $(function() {
+        $('#upload_file_btn').click(function(e) {
+            console.log("yay upload web!")
 
-
-
+            var form_data = new FormData($('#upload_file')[0]);
+            console.log('this is form_data', form_data);
+            e.preventDefault();
+            $.ajax({
+                type: 'POST',
+                url: '/upload',
+                data: form_data,
+                contentType: false,
+                cache: false,
+                processData: false,
+                async: false,
+                success: function(data) {
+                    console.log('Success!');
+                },
+            });
+        });
+      });
+   </script>
    <script>
       $(document).ready(function(){
         // var oForm_upload = document.forms["form_upload"];
@@ -126,7 +121,6 @@ $(function() {
           });
       });
    </script>
-
    <script>
       $(document).ready(function(){
         var oForm3 = document.forms["form3"];
@@ -158,17 +152,20 @@ $(function() {
                 url : '/select_cols',
                 success: function(data){
                   console.log('the newcols data:',  data.columns)
-                  // console.log('the firsthead1 data:',  data.firsthead1)
                   console.log('the newhead data:',  data.newhead)
+                  console.log('the ols_summary data:',  data.ols_summary)
+                  console.log('the ols_results data:',  data.ols_results)
+                  feature_importances
                   $("#newcols").html(data.columns);
                   $("#newhead").html(data.newhead);
-                  // $("#firsthead1").html(data.firsthead1);
+                  $("#ols_summary").html(data.ols_summary);
+                  $("#ols_results").html(data.ols_results);
+                  $("#feature_importances").html(data.feat_imps_chart);
               }
             })
           });
       });
    </script>
-
    <script>
       $(document).ready(function(){
           $("#button").click(function(e){
@@ -201,7 +198,7 @@ $(function() {
                 url : '/regressions',
                 success: function(data){
                   console.log('the data:',  data)
-                  $("#theresults").html(data);
+                  $("#regression_results").html(data);
               }
             })
           });
@@ -224,12 +221,11 @@ $(function() {
 <div class="page-header">
    <h1>Drag-n-Drop ML: <small>Code-Free Machine Learning</small></h1>
    </br>
-
    <!-- <div class="">
       <div class="jumbotron" style="overflow-x:scroll; white-space: nowrap;">
          <h3>Upload A CSV File - web</h3>
 
-   <form id="upload_file" method="post" enctype="multipart/form-data">
+      <form id="upload_file" method="post" enctype="multipart/form-data">
        <fieldset>
            <label for="file">Select a file</label>
            <input name="file" type="file">
@@ -237,18 +233,15 @@ $(function() {
        <fieldset>
            <button id="upload_file_btn" type="button">Upload web</button>
        </fieldset>
-   </form>
-</div>
-</div> -->
-
+      </form>
+      </div>
+      </div> -->
    <!-- <form id="fileinfo" enctype="multipart/form-data" method="post" name="fileinfo">
-       <label>File to stash:</label>
-       <input type="file" name="file" required />
-   </form>
-   <input type="button" value="Stash the file!"></input>
-   <div id="output"></div> -->
-
-
+      <label>File to stash:</label>
+      <input type="file" name="file" required />
+      </form>
+      <input type="button" value="Stash the file!"></input>
+      <div id="output"></div> -->
    <!-- <div class="">
       <div class="jumbotron" style="overflow-x:scroll; white-space: nowrap;">
          <h3>Upload A CSV File</h3>
@@ -259,18 +252,16 @@ $(function() {
             <button id="button_upload" type="submit" class="btn btn-primary" >Upload It!</button>
          </form>
       </div>
-   </div> -->
-
-
+      </div> -->
    <div class="container">
       <div class="">
          <div class="jumbotron" style="overflow-x:scroll; overflow-y:scroll; white-space: nowrap;">
             <h3>Summary of Uploaded Data</h3>
             <div class="table table-hover">
-              <div id="">
-                This is the new data...
-                {{firsthead}}
-              </div>
+               <div id="">
+                  This is the new data...
+                  {{firsthead}}
+               </div>
             </div>
          </div>
       </div>
@@ -278,7 +269,7 @@ $(function() {
          <div class="jumbotron" style="overflow-x:scroll; overflow-y:scroll; white-space: nowrap;">
             <h3>Select Columns</h3>
             <form name="form4" action="/change_col_names">
-            <!-- <form action='/select_cols', method='POST'> -->
+               <!-- <form action='/select_cols', method='POST'> -->
                <table class="table table-hover">
                   <thead>
                      <tr>
@@ -302,13 +293,28 @@ $(function() {
             </form>
          </div>
       </div>
+      <div class="row">
+         <div class="col-sm-6">
+            <div class="jumbotron" style="overflow-x:scroll; overflow-y:scroll; white-space: nowrap;">
+               <h3>OLS</h3>
+               <div id="ols_results" class="table table-hover text-center">
+               </div>
+            </div>
+         </div>
+         <div class="col-sm-6">
+            <div class="jumbotron" style="overflow-x:scroll; overflow-y:scroll; white-space: nowrap;">
+               <h3>Feature Importances</h3>
+               <div id="feature_importances">
+               </div>
+            </div>
+         </div>
+      </div>
       <div class="">
          <div class="jumbotron" style="overflow-x:scroll; white-space: nowrap;">
             <h3>Rename Columns</h3>
             <form name="form3" action="/change_col_names">
-              <div id="newcols">
-              </div>
-
+               <div id="newcols">
+               </div>
                <button id="button3" type="submit" class="btn btn-primary" >Rename Columns</button>
             </form>
          </div>
@@ -317,8 +323,8 @@ $(function() {
          <div class="jumbotron" style="overflow-x:scroll; overflow-y:scroll; white-space: nowrap;">
             <h3>Table Summary with New Column Names</h3>
             <div class="table table-hover">
-              <!-- <div id="result"> -->
-                <div id="newcolshead">
+               <!-- <div id="result"> -->
+               <div id="newcolshead">
                   some text
                </div>
             </div>
@@ -353,18 +359,9 @@ $(function() {
          <div class="col-sm-7">
             <div class="jumbotron" style="overflow-x:scroll; overflow-y:scroll; white-space: nowrap;">
                <h3>Regression Results</h3>
-               <div id="theresults">
+               <div id="regression_results">
                </div>
             </div>
-         </div>
-         <div class="col-sm-7">
-            <div class="jumbotron" style="overflow-x:scroll; overflow-y:scroll; white-space: nowrap;">
-               <h3>firsthead1</h3>
-               <div id="firsthead1">
-               </div>
-                 <!-- <div id="newcols">
-
-               </div> -->
          </div>
       </div>
    </div>

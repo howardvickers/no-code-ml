@@ -9,7 +9,14 @@ import pandas as pd
 import numpy as np
 import os
 from ols_summary import train_model as ols_tm
+from ols_summary import create_feat_imp_chart as cfic
 from regressions import run_models as rm
+
+
+import io
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.figure import Figure
+
 
 def build_regression_results_table(dict):
     top = '<table class="table table-hover"> <thead> <tr> <th scope="col">Model</th> <th scope="col">RMSE (Train)</th> <th scope="col">RMSE (Test)</th> <th scope="col">R-Squared</th> </tr> </thead> <tbody>'
@@ -169,8 +176,13 @@ def select_cols():
         html_cols = build_cols_rename_table(columns)
         X = df_X
         y = df[global_y.y_col_name]
-        ols_results = ols_tm(X.astype(float), y)
+        feat_imps_chart_url = cfic(X.astype(float), y)
+        feat_imps_chart = '<embed class="d-block w-100" src="../{}">'.format(feat_imps_chart_url)
+        # feat_imps_chart = cfic(X.astype(float), y)
+
+        ols_results, ols_coefs_pvals = ols_tm(X.astype(float), y)
         ols_summary = Markup(ols_results)
+        ols_coefs_pvals = Markup(ols_coefs_pvals)
         model_comparison_dict = {}
         models = ['Linear Regression', 'Random Forest', 'Gradient Boosting', 'K Neighbors', 'S V R', 'Elastic Net']
         return flask.jsonify(
@@ -179,7 +191,9 @@ def select_cols():
                                 models = models,
                                 columns = html_cols,
                                 model_comparison_dict = model_comparison_dict,
-                                ols_summary = ols_summary
+                                ols_summary = ols_summary,
+                                ols_results = ols_coefs_pvals,
+                                feat_imps_chart = feat_imps_chart
                                 )
 
         # return html_cols
