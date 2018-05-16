@@ -69,9 +69,24 @@ app = Flask(__name__)
 def index():
     return flask.render_template('index.html')
 
-# @app.route('/upload')
+
+@app.route('/ml')
+def ml():
+    return flask.render_template('ml.html')
+
+# @app.route('/upload', methods=["POST"])
 # def upload():
-#     return flask.render_template('upload.html')
+#     f = request.files['data_file']
+#     if not f:
+#         return "No file"
+#     df = pd.read_csv(f)
+#     print('df.head(): ', df.head())
+#     df.to_csv('../data/df.csv')
+#     head2 = print_head(df)
+#     print('the head2', head2)
+#     columns = list(df.columns)
+#
+#     return flask.jsonify(head_table2 = head2)
 
 @app.route('/uploadcsv', methods=["POST"])
 def uploadcsv():
