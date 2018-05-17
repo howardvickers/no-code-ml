@@ -95,6 +95,31 @@ def ml():
 #
 #     return flask.jsonify(head_table2 = head2)
 
+def rename_col_types(df):
+    cols_types = df.dtypes[1:].to_dict()
+    for k, v in cols_types.items():
+        if v == 'int64':
+            cols_types[k] = ['Numeric', '']
+        elif v == 'float64':
+            cols_types[k] = ['Numeric', '']
+        else:
+            cols_types[k] = ['Text', 'disabled']
+    return cols_types
+
+def append_cols_types(cols_types, coefs_dict, pvals_dict):
+    for k, v in cols_types.items():
+        for key, value in coefs_dict.items():
+            if k == key:
+                cols_types[k] = v.append(value)
+                cols_types[k] = v
+        for key, value in pvals_dict.items():
+            if k == key:
+                cols_types[k] = v.append(value)
+                cols_types[k] = v
+    return cols_types
+
+
+
 @app.route('/uploadcsv', methods=["POST"])
 def uploadcsv():
     print('hello uploadcsv')
@@ -108,40 +133,24 @@ def uploadcsv():
     head1 = print_head(df)
     print('the head', head1)
     columns = list(df.columns)
-    # resp = flask.make_response(jsonify(head_table = head1), 200)
-    # resp.mimetype = "text/javascript"
-    # return resp
+    cols_types = rename_col_types(df)
+    coefs_dict = {}
+    pvals_dict = {}
+    # coefs_dict, pvals_dict = ols_tm(X.astype(float), y)
+    append_cols_types(cols_types, coefs_dict, pvals_dict)
+    print('cols_types:', cols_types)
 
-
-
-    # return flask.jsonify(head_table = head1)
-
-    # return ("{'head_table': 'testv'}")
     models = ['Linear Regression', 'Random Forest', 'Gradient Boosting', 'K Neighbors', 'S V R', 'Elastic Net']
 
     return flask.render_template(
                                 'ml.html',
                                 firsthead = head1,
+                                cols_types = cols_types,
+                                # ols_results = cols_types,
                                 columns = columns,
                                 models = models
                                 )
 
-
-# @app.route('/head', methods=["POST"])
-# def head():
-#     f = request.files['data_file']
-#     if not f:
-#         return "No file"
-#     df = pd.read_csv(f)
-#     df.to_csv('../data/df.csv')
-#     head = print_head(df)
-#     columns = list(df.columns)
-#
-#     return flask.render_template(
-#                                 'ml.html',
-#                                 firsthead = head,
-#                                 columns = columns
-#                                 )
 
 @app.route('/select_cols', methods=["POST", "GET"])
 def select_cols():
@@ -180,9 +189,18 @@ def select_cols():
         feat_imps_chart = '<embed class="d-block w-100" src="../{}">'.format(feat_imps_chart_url)
         # feat_imps_chart = cfic(X.astype(float), y)
 
-        ols_results, ols_coefs_pvals = ols_tm(X.astype(float), y)
-        ols_summary = Markup(ols_results)
-        ols_coefs_pvals = Markup(ols_coefs_pvals)
+        # ols_results, ols_coefs_pvals = ols_tm(X.astype(float), y)
+        # ols_summary = Markup(ols_results)
+        # ols_coefs_pvals = Markup(ols_coefs_pvals)
+        cols_types = rename_col_types(df)
+        # coefs_dict = {'point_longitude': '222'}
+        # pvals_dict = {}
+        coefs_dict, pvals_dict = ols_tm(X.astype(float), y)
+        print('coefs_dict:', coefs_dict)
+        print('pvals_dict:', pvals_dict)
+        append_cols_types(cols_types, coefs_dict, pvals_dict)
+        print('cols_types', cols_types)
+        sometext = 'some text'
         model_comparison_dict = {}
         models = ['Linear Regression', 'Random Forest', 'Gradient Boosting', 'K Neighbors', 'S V R', 'Elastic Net']
         return flask.jsonify(
@@ -191,8 +209,11 @@ def select_cols():
                                 models = models,
                                 columns = html_cols,
                                 model_comparison_dict = model_comparison_dict,
-                                ols_summary = ols_summary,
-                                ols_results = ols_coefs_pvals,
+                                # ols_summary = ols_summary,
+                                ols_results = sometext,
+                                coefs_dict = coefs_dict,
+                                pvals_dict = pvals_dict,
+                                cols_types = cols_types,
                                 feat_imps_chart = feat_imps_chart
                                 )
 

@@ -15,9 +15,13 @@ def train_model(X, y):
     # coefs = results.params
     pvals = round(results.pvalues, 5)
     # pvals = results.pvalues
+    print('coefs:', coefs.to_dict())
+    print('pvals:', pvals.to_dict())
 
     df_results = pd.concat([coefs, pvals], axis=1)
     df_results.columns = ['Coefficients', 'P Values']
+    # coefs_pvals_dict = df_results.to_dict()
+    # print('coefs_pvals_dict: ', coefs_pvals_dict)
     num_rows = df_results.shape[0]
     coefs_pvals = df_results.head(num_rows)
     # print('coefs_pvals:', coefs_pvals)
@@ -30,7 +34,8 @@ def train_model(X, y):
     # print('df_results: ', df_results)
     # print('type(df_results): ', type(df_results))
 
-    return results.summary().as_html(), coefs_pvals.to_html()
+    # return results.summary().as_html(), coefs_pvals.to_html()
+    return coefs.to_dict(), pvals.to_dict()
 
 
 def get_feat_imps(X, y):

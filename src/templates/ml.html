@@ -263,7 +263,6 @@
             <h3>Summary of Uploaded Data</h3>
             <div class="table table-hover">
                <div id="">
-                  This is the new data...
                   {{firsthead}}
                </div>
             </div>
@@ -273,32 +272,32 @@
          <div class="jumbotron" style="overflow-x:scroll; overflow-y:scroll; white-space: nowrap;">
             <h3>Select Columns</h3>
             <h3><small>Select Multiple Columns to Include and Select a Single Dependent (Y) Variable</small></h3>
-            <form name="form4" action="/change_col_names">
-               <!-- <form action='/select_cols', method='POST'> -->
+            <form name="form4" action="/select_cols">
                <table class="table table-hover">
                   <thead>
                      <tr>
                         <th scope="col">Column</th>
+                        <th scope="col">Data Type</th>
                         <th scope="col">Include</th>
                         <th scope="col">Y Column</th>
+                        <!-- <th scope="col">Coefficients</th>
+                        <th scope="col">P Values</th> -->
                      </tr>
                   </thead>
                   <tbody>
-                     {% for col in columns %}
+                     {% for col, typ in cols_types.items() %}
                      <tr>
                         <td>{{col}}</td>
-
-                        <td><input id="checkBox_{{columns.index(col)}}" type="checkbox" name="{{col}}" data-toggle="toggle" data-size="mini" value="keep" data-on="Include" data-off="Drop" /></td>
-                        <td><input id="checkBox_{{columns.index(col)}}" type="checkbox" name="{{col}}" data-toggle="toggle" data-size="mini" value="y" data-on="Dependent" data-off="Independent" /></td>
-
-                        <!-- <td class="radio-inline"><input id="checkBox_{{columns.index(col)}}" type="radio" name="{{col}}" value="keep"/></td> -->
-                        <!-- <td class="radio-inline"><input id="checkBox_{{columns.index(col)}}" type="radio" name="{{col}}" value="y"/></td> -->
+                        <td>{{typ[0]}}</td>
+                        <td><input {{typ[1]}} id="checkBox_{{columns.index(col)}}" type="checkbox" name="{{col}}" data-toggle="toggle" data-size="mini" value="keep" data-on="Include" data-off="Drop" /></td>
+                        <td><input {{typ[1]}} id="checkBox_{{columns.index(col)}}" type="checkbox" name="{{col}}" data-toggle="toggle" data-size="mini" value="y" data-on="Dependent" data-off="Independent" /></td>
+                        <!-- <td>{{typ[2]}}</td>
+                        <td>{{typ[3]}}</td> -->
                      </tr>
-                  </tbody>
                   {% endfor %}
+                </tbody>
                </table>
                <button id="button4" type="submit" class="btn btn-primary" >Select Columns</button>
-               <!-- <button type="submit" value="submit"class="btn btn-primary" >Submit</button> -->
             </form>
          </div>
       </div>
@@ -306,7 +305,25 @@
          <div class="col-sm-6">
             <div class="jumbotron" style="overflow-x:scroll; overflow-y:scroll; white-space: nowrap;">
                <h3>OLS</h3>
-               <div id="ols_results" class="table table-hover text-center">
+               <div id="ols_results">
+                 <!-- <table class="table table-hover">
+                    <thead>
+                       <tr>
+                          <th scope="col">Column</th>
+                          <th scope="col">Coefficients</th>
+                          <th scope="col">P Values</th>
+                       </tr>
+                    </thead>
+                    <tbody>
+                       {% for col, typ in cols_types.items() %}
+                       <tr>
+                          <td>{{col}}</td>
+                          <td>{{typ[2]}}</td>
+                          <td>{{typ[3]}}</td>
+                       </tr>
+                    {% endfor %}
+                  </tbody>
+                 </table> -->
                </div>
             </div>
          </div>
