@@ -159,8 +159,10 @@
                   console.log('the newhead data:',  data.newhead)
                   console.log('the ols_summary data:',  data.ols_summary)
                   console.log('the ols_results data:',  data.ols_results)
+                  console.log('the html_select data:',  data.html_select)
                   feature_importances
                   $("#newcols").html(data.columns);
+                  $("#html_select").html(data.html_select);
                   $("#newhead").html(data.newhead);
                   $("#ols_summary").html(data.ols_summary);
                   $("#ols_results").html(data.ols_results);
@@ -270,8 +272,20 @@
       </div>
       <div class="">
          <div class="jumbotron" style="overflow-x:scroll; overflow-y:scroll; white-space: nowrap;">
-            <h3>Select Columns</h3>
+            <h3>Select Columns (html_select)</h3>
             <h3><small>Select Multiple Columns to Include and Select a Single Dependent (Y) Variable</small></h3>
+            <form name="form4" action="/select_cols">
+                <div id="html_select">
+                  {{html_select}}
+                </div>
+               <button id="button4" type="submit" class="btn btn-primary" >Select Columns</button>
+            </form>
+         </div>
+      </div>
+      <div class="">
+         <div class="jumbotron" style="overflow-x:scroll; overflow-y:scroll; white-space: nowrap;">
+            <h3>Select Columns</h3>
+            <!-- <h3><small>Select Multiple Columns to Include and Select a Single Dependent (Y) Variable</small></h3>
             <form name="form4" action="/select_cols">
                <table class="table table-hover">
                   <thead>
@@ -280,8 +294,8 @@
                         <th scope="col">Data Type</th>
                         <th scope="col">Include</th>
                         <th scope="col">Y Column</th>
-                        <!-- <th scope="col">Coefficients</th>
-                        <th scope="col">P Values</th> -->
+                        <th scope="col">Coefficients</th>
+                        <th scope="col">P Values</th>
                      </tr>
                   </thead>
                   <tbody>
@@ -289,16 +303,17 @@
                      <tr>
                         <td>{{col}}</td>
                         <td>{{typ[0]}}</td>
-                        <td><input {{typ[1]}} id="checkBox_{{columns.index(col)}}" type="checkbox" name="{{col}}" data-toggle="toggle" data-size="mini" value="keep" data-on="Include" data-off="Drop" /></td>
+                        <td><input type="checkbox" name="policyID" data-toggle="toggle" data-size="mini" value="keep" data-on="Include" data-off="Drop">
+                        <td><input {{typ[1]}}  type="checkbox" name="{{col}}" data-toggle="toggle" data-size="mini" value="keep" data-on="Include" data-off="Drop" /></td>
                         <td><input {{typ[1]}} id="checkBox_{{columns.index(col)}}" type="checkbox" name="{{col}}" data-toggle="toggle" data-size="mini" value="y" data-on="Dependent" data-off="Independent" /></td>
-                        <!-- <td>{{typ[2]}}</td>
-                        <td>{{typ[3]}}</td> -->
+                        <td>{{typ[2]}}</td>
+                        <td>{{typ[3]}}</td>
                      </tr>
                   {% endfor %}
                 </tbody>
                </table>
                <button id="button4" type="submit" class="btn btn-primary" >Select Columns</button>
-            </form>
+            </form> -->
          </div>
       </div>
       <div class="row">

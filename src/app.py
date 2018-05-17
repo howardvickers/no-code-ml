@@ -39,6 +39,26 @@ def build_cols_rename_table(list):
         mid_rows += row
     return top+mid_rows+bottom
 
+
+def build_select_cols_table(dict):
+    print('dict:', dict)
+    scripts = ''
+    # scripts = '<link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet"> <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>'
+    top = '<table class="table table-hover"> <thead> <tr> <th scope="col">Column</th> <th scope="col">Data Type</th> <th scope="col">Include</th> <th scope="col">Y Column</th> <th scope="col">Coefficients</th> <th scope="col">P Values</th> </tr> </thead> <tbody>'
+    middle = '<tr> <td>{}</td><td>{}</td> <td><input {} type="checkbox" name="{}" data-toggle="toggle" data-size="mini" value="keep" data-on="Include" data-off="Drop" /></td> <td><input {} id="checkBox_{{columns.index(col)}}" type="checkbox" name="{}" data-toggle="toggle" data-size="mini" value="y" data-on="Dependent" data-off="Independent" /></td> <td>{}</td> <td>{}</td> </tr>'
+    bottom =   '</tbody></table>'
+    mid_rows = ""
+    for col, typ in dict.items():
+        print('col:', col)
+        print('typ[0]:' ,typ[0])
+        print('typ[1]:' ,typ[1])
+        print('typ[2]:' ,typ[2])
+        print('typ[3]:' ,typ[3])
+
+        row = middle.format(col, typ[0], typ[1], col, typ[1], col, typ[2], typ[3])
+        mid_rows += row
+    return scripts+top+mid_rows+bottom
+
 def print_head(df):
     """converts pandas 'head' to html; returns html"""
     head = df.head().to_html()
@@ -99,22 +119,22 @@ def rename_col_types(df):
     cols_types = df.dtypes[1:].to_dict()
     for k, v in cols_types.items():
         if v == 'int64':
-            cols_types[k] = ['Numeric', '']
+            cols_types[k] = ['Numeric', '', '', '']
         elif v == 'float64':
-            cols_types[k] = ['Numeric', '']
+            cols_types[k] = ['Numeric', '', '', '']
         else:
-            cols_types[k] = ['Text', 'disabled']
+            cols_types[k] = ['Text', 'disabled', '', '']
     return cols_types
 
 def append_cols_types(cols_types, coefs_dict, pvals_dict):
     for k, v in cols_types.items():
         for key, value in coefs_dict.items():
             if k == key:
-                cols_types[k] = v.append(value)
-                cols_types[k] = v
+                cols_types[k][2] = value
+                # cols_types[k] = v
         for key, value in pvals_dict.items():
             if k == key:
-                cols_types[k] = v.append(value)
+                cols_types[k][3] = value
                 cols_types[k] = v
     return cols_types
 
@@ -139,6 +159,8 @@ def uploadcsv():
     # coefs_dict, pvals_dict = ols_tm(X.astype(float), y)
     append_cols_types(cols_types, coefs_dict, pvals_dict)
     print('cols_types:', cols_types)
+    html_select = build_select_cols_table(cols_types)
+    print('html_select:', html_select)
 
     models = ['Linear Regression', 'Random Forest', 'Gradient Boosting', 'K Neighbors', 'S V R', 'Elastic Net']
 
@@ -147,6 +169,7 @@ def uploadcsv():
                                 firsthead = head1,
                                 cols_types = cols_types,
                                 # ols_results = cols_types,
+                                html_select = Markup(html_select),
                                 columns = columns,
                                 models = models
                                 )
@@ -188,18 +211,20 @@ def select_cols():
         feat_imps_chart_url = cfic(X.astype(float), y)
         feat_imps_chart = '<embed class="d-block w-100" src="../{}">'.format(feat_imps_chart_url)
         # feat_imps_chart = cfic(X.astype(float), y)
-
         # ols_results, ols_coefs_pvals = ols_tm(X.astype(float), y)
         # ols_summary = Markup(ols_results)
         # ols_coefs_pvals = Markup(ols_coefs_pvals)
         cols_types = rename_col_types(df)
         # coefs_dict = {'point_longitude': '222'}
         # pvals_dict = {}
+        html_select = build_select_cols_table(cols_types)
         coefs_dict, pvals_dict = ols_tm(X.astype(float), y)
         print('coefs_dict:', coefs_dict)
         print('pvals_dict:', pvals_dict)
         append_cols_types(cols_types, coefs_dict, pvals_dict)
         print('cols_types', cols_types)
+        html_select = build_select_cols_table(cols_types)
+        print('html_select:', html_select)
         sometext = 'some text'
         model_comparison_dict = {}
         models = ['Linear Regression', 'Random Forest', 'Gradient Boosting', 'K Neighbors', 'S V R', 'Elastic Net']
@@ -208,6 +233,7 @@ def select_cols():
                                 firsthead1 = head1,
                                 models = models,
                                 columns = html_cols,
+                                html_select = html_select,
                                 model_comparison_dict = model_comparison_dict,
                                 # ols_summary = ols_summary,
                                 ols_results = sometext,
