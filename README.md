@@ -1,4 +1,4 @@
-# [no-code-ml.com](https://no-code-ml.com)
+# [no-code-ml.com](http://no-code-ml.com)
 ### Project Introduction
 This is a personal project to create a web app that allows someone with no coding experience to run machine learning algorithms on business data.
 
