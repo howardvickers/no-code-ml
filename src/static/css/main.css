@@ -1,3 +1,8 @@
+.i
+{
+  margin: 150px 300px
+}
+
 .myModal
 {
   position: absolute;
@@ -15,11 +20,36 @@
   max-width: 100%;
 }
 
-.jumbotron
+.myText
 {
-  height: 300px;
+  font-size: medium;
 }
 
+.jumbotron .container
+{
+
+}
+
+#jumbo {
+  padding-top: 20px;
+  padding-left: 40px;
+  padding-right: 40px;
+  height: 450px;
+}
+
+#jumbo_top {
+  padding-top: 20px;
+  padding-left: 40px;
+  padding-right: 40px;
+  height: 250px;
+}
+
+#jumbo_upload {
+  padding-top: 20px;
+  padding-left: 40px;
+  padding-right: 40px;
+  height: 150px;
+}
 @import url();
 
 

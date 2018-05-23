@@ -12,29 +12,14 @@ def train_model(X, y):
     model = sm.OLS(y, X, missing='drop')
     results = model.fit()
     coefs = round(results.params, 2)
-    # coefs = results.params
     pvals = round(results.pvalues, 5)
-    # pvals = results.pvalues
     print('coefs:', coefs.to_dict())
     print('pvals:', pvals.to_dict())
 
     df_results = pd.concat([coefs, pvals], axis=1)
     df_results.columns = ['Coefficients', 'P Values']
-    # coefs_pvals_dict = df_results.to_dict()
-    # print('coefs_pvals_dict: ', coefs_pvals_dict)
     num_rows = df_results.shape[0]
     coefs_pvals = df_results.head(num_rows)
-    # print('coefs_pvals:', coefs_pvals)
-    # print('df_results: ', df_results)
-    # print(results.summary())
-    # print('pvals: ', pvals)
-    # print('coefs: ', coefs)
-    # print('type(pvals): ', type(pvals))
-    # print('type(coefs): ', type(coefs))
-    # print('df_results: ', df_results)
-    # print('type(df_results): ', type(df_results))
-
-    # return results.summary().as_html(), coefs_pvals.to_html()
     return coefs.to_dict(), pvals.to_dict()
 
 
@@ -55,21 +40,9 @@ def get_feat_imps(X, y):
 
     return model_params, feat_imps, column_names
 
-
-# def get_imps_names():
-#     _, feat_imps, cols = get_feat_imps()
-#
-#     # col_dict = nice_column_names()
-#     X_train_dot_columns = cols
-#     something = [col_dict.get(x, x) for x in X_train_dot_columns]
-#     imps, names = zip(*sorted(zip(feat_imps, [col_dict.get(x) for x in X_train_dot_columns])))
-#     return imps, names
-
 def create_feat_imp_chart(X, y):
-    # imps, names = get_imps_names()
     _, imps, names = get_feat_imps(X, y)
     imps, names = zip(*sorted(zip(imps, names)))
-
 
     plt.style.use('bmh')
     plt.barh(range(len(names)), imps, align='center')

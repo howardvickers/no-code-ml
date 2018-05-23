@@ -11,12 +11,8 @@ import os
 from ols_summary import train_model as ols_tm
 from ols_summary import create_feat_imp_chart as cfic
 from regressions import run_models as rm
-
-
-import io
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
-
 
 def build_regression_results_table(dict):
     top = '<table class="table table-hover"> <thead> <tr> <th scope="col">Model</th> <th scope="col">RMSE (Train)</th> <th scope="col">RMSE (Test)</th> <th scope="col">R-Squared</th> </tr> </thead> <tbody>'
@@ -28,7 +24,6 @@ def build_regression_results_table(dict):
         mid_rows += row
     return top+mid_rows+bottom
 
-
 def build_cols_rename_table(list):
     top = '<table class="table table-hover"><thead><tr><th scope="col">Old Name</th><th scope="col">New Name</th></tr></thead><tbody>'
     middle = '<tr> <td>{}</td> <td><input type="text" name="{}" placeholder="New Column Name"></td></tr>'
@@ -39,25 +34,19 @@ def build_cols_rename_table(list):
         mid_rows += row
     return top+mid_rows+bottom
 
-
-def build_select_cols_table(dict):
+def build_ols_results_table(dict):
     print('dict:', dict)
-    scripts = ''
-    # scripts = '<link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet"> <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>'
-    top = '<table class="table table-hover"> <thead> <tr> <th scope="col">Column</th> <th scope="col">Data Type</th> <th scope="col">Include</th> <th scope="col">Y Column</th> <th scope="col">Coefficients</th> <th scope="col">P Values</th> </tr> </thead> <tbody>'
-    middle = '<tr> <td>{}</td><td>{}</td> <td><input {} type="checkbox" name="{}" data-toggle="toggle" data-size="mini" value="keep" data-on="Include" data-off="Drop" /></td> <td><input {} id="checkBox_{{columns.index(col)}}" type="checkbox" name="{}" data-toggle="toggle" data-size="mini" value="y" data-on="Dependent" data-off="Independent" /></td> <td>{}</td> <td>{}</td> </tr>'
+    top = '<table class="table table-hover"> <thead> <tr> <th scope="col">Column</th><th scope="col">Coefficients</th> <th scope="col">P Values</th> </tr> </thead> <tbody>'
+    middle = '<tr><td>{}</td><td>{}</td><td>{}</td></tr>'
     bottom =   '</tbody></table>'
     mid_rows = ""
     for col, typ in dict.items():
         print('col:', col)
-        print('typ[0]:' ,typ[0])
-        print('typ[1]:' ,typ[1])
         print('typ[2]:' ,typ[2])
         print('typ[3]:' ,typ[3])
-
-        row = middle.format(col, typ[0], typ[1], col, typ[1], col, typ[2], typ[3])
+        row = middle.format(col, typ[2], typ[3])
         mid_rows += row
-    return scripts+top+mid_rows+bottom
+    return top+mid_rows+bottom
 
 def print_head(df):
     """converts pandas 'head' to html; returns html"""
@@ -75,7 +64,6 @@ def drop_unnamed_col(df):
 
 def compare_models(data_url, y_name, models):
     """passes list of models to compare to GridSearchCV in rm(); returns model_comparison_dict"""
-    # X, y = get_X_y(data_url, y_name)
     df = pd.read_csv(data_url)
     X = df.drop(y_name, axis=1)
     y = df[y_name]
@@ -83,37 +71,15 @@ def compare_models(data_url, y_name, models):
     print('X.head(), y.head(), models: ', X.head(), y.head(), models)
     return model_comparison_dict
 
-# def get_X_y(data_url, y_name):
-#     """reloads data as csv and separates into two dataframes (X, y); returns X, y"""
-#     df = pd.read_csv(data_url)
-#     X = df.drop(y_name, axis=1)
-#     y = df[y_name]
-#     return X, y
-
 app = Flask(__name__)
 
 @app.route('/')
 def index():
     return flask.render_template('index.html')
 
-
 @app.route('/ml')
 def ml():
     return flask.render_template('ml.html')
-
-# @app.route('/upload', methods=["POST"])
-# def upload():
-#     f = request.files['data_file']
-#     if not f:
-#         return "No file"
-#     df = pd.read_csv(f)
-#     print('df.head(): ', df.head())
-#     df.to_csv('../data/df.csv')
-#     head2 = print_head(df)
-#     print('the head2', head2)
-#     columns = list(df.columns)
-#
-#     return flask.jsonify(head_table2 = head2)
 
 def rename_col_types(df):
     cols_types = df.dtypes[1:].to_dict()
@@ -131,18 +97,14 @@ def append_cols_types(cols_types, coefs_dict, pvals_dict):
         for key, value in coefs_dict.items():
             if k == key:
                 cols_types[k][2] = value
-                # cols_types[k] = v
         for key, value in pvals_dict.items():
             if k == key:
                 cols_types[k][3] = value
                 cols_types[k] = v
     return cols_types
 
-
-
 @app.route('/uploadcsv', methods=["POST"])
 def uploadcsv():
-    print('hello uploadcsv')
     print('type (request)', type (request.files['data_file']))
     f = request.files['data_file']
     if not f:
@@ -156,11 +118,8 @@ def uploadcsv():
     cols_types = rename_col_types(df)
     coefs_dict = {}
     pvals_dict = {}
-    # coefs_dict, pvals_dict = ols_tm(X.astype(float), y)
     append_cols_types(cols_types, coefs_dict, pvals_dict)
     print('cols_types:', cols_types)
-    html_select = build_select_cols_table(cols_types)
-    print('html_select:', html_select)
 
     models = ['Linear Regression', 'Random Forest', 'Gradient Boosting', 'K Neighbors', 'S V R', 'Elastic Net']
 
@@ -168,12 +127,36 @@ def uploadcsv():
                                 'ml.html',
                                 firsthead = head1,
                                 cols_types = cols_types,
-                                # ols_results = cols_types,
-                                html_select = Markup(html_select),
                                 columns = columns,
                                 models = models
                                 )
 
+@app.route('/demo', methods=["GET"])
+def demo():
+    f = '../data/demo.csv'
+    if not f:
+        return "No file"
+    df = pd.read_csv(f)
+    print('df.head(): ', df.head())
+    df.to_csv('../data/df.csv')
+    head1 = print_head(df)
+    print('the head', head1)
+    columns = list(df.columns)
+    cols_types = rename_col_types(df)
+    coefs_dict = {}
+    pvals_dict = {}
+    append_cols_types(cols_types, coefs_dict, pvals_dict)
+    print('cols_types:', cols_types)
+
+    models = ['Linear Regression', 'Random Forest', 'Gradient Boosting', 'K Neighbors', 'S V R', 'Elastic Net']
+
+    return flask.render_template(
+                                'ml.html',
+                                firsthead = head1,
+                                cols_types = cols_types,
+                                columns = columns,
+                                models = models
+                                )
 
 @app.route('/select_cols', methods=["POST", "GET"])
 def select_cols():
@@ -210,22 +193,13 @@ def select_cols():
         y = df[global_y.y_col_name]
         feat_imps_chart_url = cfic(X.astype(float), y)
         feat_imps_chart = '<embed class="d-block w-100" src="../{}">'.format(feat_imps_chart_url)
-        # feat_imps_chart = cfic(X.astype(float), y)
-        # ols_results, ols_coefs_pvals = ols_tm(X.astype(float), y)
-        # ols_summary = Markup(ols_results)
-        # ols_coefs_pvals = Markup(ols_coefs_pvals)
         cols_types = rename_col_types(df)
-        # coefs_dict = {'point_longitude': '222'}
-        # pvals_dict = {}
-        html_select = build_select_cols_table(cols_types)
+        html_ols_results = build_ols_results_table(cols_types)
         coefs_dict, pvals_dict = ols_tm(X.astype(float), y)
-        print('coefs_dict:', coefs_dict)
-        print('pvals_dict:', pvals_dict)
-        append_cols_types(cols_types, coefs_dict, pvals_dict)
+        cols_types = append_cols_types(cols_types, coefs_dict, pvals_dict)
         print('cols_types', cols_types)
-        html_select = build_select_cols_table(cols_types)
-        print('html_select:', html_select)
-        sometext = 'some text'
+        print('*'*20)
+        html_ols_results = build_ols_results_table(cols_types)
         model_comparison_dict = {}
         models = ['Linear Regression', 'Random Forest', 'Gradient Boosting', 'K Neighbors', 'S V R', 'Elastic Net']
         return flask.jsonify(
@@ -233,17 +207,13 @@ def select_cols():
                                 firsthead1 = head1,
                                 models = models,
                                 columns = html_cols,
-                                html_select = html_select,
                                 model_comparison_dict = model_comparison_dict,
-                                # ols_summary = ols_summary,
-                                ols_results = sometext,
+                                ols_results = html_ols_results,
                                 coefs_dict = coefs_dict,
                                 pvals_dict = pvals_dict,
                                 cols_types = cols_types,
                                 feat_imps_chart = feat_imps_chart
                                 )
-
-        # return html_cols
 
     elif request.method=='GET':
         return "OK this is a GET method"
@@ -261,6 +231,10 @@ def change_col_names():
         print('k:', k)
         print('v:', v)
         print('global_y.y_col_name:', global_y.y_col_name)
+        if v == '':
+            v = k
+        print('k:', k)
+        print('v:', v)
         df.rename(columns={k: v}, inplace=True)
         if k == global_y.y_col_name:
             global_y.y_col_name = v

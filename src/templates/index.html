@@ -24,6 +24,8 @@
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
    <link href="{{ url_for('static', filename='css/jquery-3.3.1.min.js') }}" rel="stylesheet">
    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+   <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+   <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
    <script>
       $(document).ready(function(){
         var oForm3 = document.forms["form3"];
@@ -40,8 +42,6 @@
             })
           });
       });
-   </script>
-   <script>
       $(document).ready(function(){
           $("#button").click(function(e){
             console.log("click!")
@@ -55,20 +55,22 @@
                 contentType: false,
                 success: function(d){
                   $("#firsthead").html(d.head_table);
-                },
-                error: function(err){
-                  console.log("error!")
-                  alert("error is: " + errorThrown);
-                },
-                complete: function(){
-                  console.log("complete!")
-                  alert("this is complete");
                 }
             });
           });
       });
-   </script>
-   <script>
+      $(document).ready(function(){
+          $("#demo_btn").click(function(e){
+              e.preventDefault();
+              $.ajax({
+                type : 'GET',
+                url : '/demo',
+                success: function(){
+                  console.log('demo started');
+              }
+            })
+          });
+      });
       $(document).ready(function(){
         var oForm2 = document.forms["form2"];
           $("#button2").click(function(e){
@@ -85,43 +87,155 @@
             })
           });
       });
+      $(function () {
+         $('[data-toggle="popover"]').popover()
+         })
    </script>
 </head>
 {% endblock %}
 {% block content %}
 <div class="container">
-</br>
-<!-- <ul class="nav nav-tabs">
-   <li role="presentation" class="active"><a href="/">Step 1: Upload</a></li>
-   <li role="presentation"><a href="/data">Step 2: Select Columns</a></li>
-   <li role="presentation"><a href="/models">Step 3: Rename Columns</a></li>
-   <li role="presentation"><a href="/predictions">Predictions</a></li>
-   <li role="presentation"><a href="/county">County</a></li>
-   <li role="presentation"><a href="/state">State</a></li>
-   <li role="presentation"><a href="/about">About/Contact</a></li>
-</ul> -->
-<div class="page-header">
-  <h1>No-Code ML: <small>Code-Free Machine Learning</small></h1>
    </br>
-   <div class="container">
-     <div class="">
-        <div class="jumbotron" style="overflow-x:scroll; white-space: nowrap;">
-           <form id="upload" name="form_upload" enctype="multipart/form-data" method="post" action="/uploadcsv">
-              <div class="col">
-                 <input type="file" name="data_file" />
-                 <button id="btn_upload" type="submit" class="btn btn-primary" >Upload</button>
-              </div>
-           </form>
-        </div>
-     </div>
-     <div class="">
-        <div class="jumbotron" style="overflow-x:scroll; white-space: nowrap;">
-          <div id="firsthead">
-            This is... {{firsthead}}
-          </div>
-        </div>
-     </div>
+   <div class="page-header">
+      <div class="container">
+         <div class="">
+            <a href="/demo" style="text-decoration:none">
+               <div id="jumbo_top" class="jumbotron " style="overflow-x:scroll; overflow-y:scroll; white-space: nowrap;">
+                  <h1>No-Code ML</h1>
+                  <h1><small>Code-Free Machine Learning</small></h1>
+               </div>
+            </a>
+         </div>
+         <div class="">
+            <div class="row">
+               <div class="col-sm-6">
+                  <div id="jumbo_upload" class="jumbotron" style="overflow-x:scroll; overflow-y:scroll; white-space: nowrap;">
+                     <h2>Upload <button type="button" class="btn btn-sm btn-secondary" data-toggle="popover" title="Upload Disabled" data-content="Upload has been disabled to ensure a good user experience.  Click on the Demo button to explore the site."><i>i</i></button></h2>
+                     <form id="upload" name="form_upload" enctype="multipart/form-data" method="post" action="/uploadcsv">
+                        <div class="col">
+                           <input type="file" name="data_file">
+                           <button id="btn_upload" type="submit" class="btn btn-lg btn-primary" disabled >Upload</button>
+                        </div>
+                     </form>
+                  </div>
+               </div>
+               <div class="col-sm-6">
+                  <div id="jumbo_upload" class="jumbotron" style="overflow-x:scroll; white-space: nowrap;">
+                     <h2>Demo Mode <button type="button" class="btn btn-sm btn-secondary" data-toggle="popover" title="Click Demo" data-content="The upload function has been disabled - click on the Demo button to start."><i>i</i></button></h2>
+                     <div>
+                        <form action="/demo">
+                           <div class="col">
+                              </br>
+                              <button type="submit" class="btn btn-lg btn-primary">Demo</button>
+                           </div>
+                        </form>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <div class="">
+               <div id="jumbo" class="jumbotron" style="overflow-x:scroll">
+                  <h2>About </h2>
+                  <div class="myText">
+                     This website is a personal project to demonstrate how (small doses of) machine learning can be made more accessible to non-data scientists.
+                     </br>
+                     </br>
+                     For example, imagine sales numbers not just being shared as tables and charts of historic data, but as an interactive tool, where different teams could explore a more predictive analysis.
+                     This could enable more in-depth discussions about the factors driving sales and how best to predict future performance (beyond just drawing a straight line on an excel chart!)</small></small>
+                     </br>
+                     </br>
+                     This site allows users to upload a csv file (see <i>Demo Only</i> section below) and use point-n-click skills to carry out data manipulation normally done in python code (especially Numpy and Pandas).</small></small>
+                     <ul>
+                        <li>Select variables (columns) to analyze</li>
+                        <li>Identify the variables (columns) that offer the most predictive power</li>
+                        <li>Rename columns for more meaningful labels</li>
+                        <li>Run and compare several regression analyses (including Linear Regression, Random Forest, K Neighbors)</li>
+                     </ul>
+                  </div>
+               </div>
+            </div>
+            <div class="">
+               <div id="jumbo" class="jumbotron" style="overflow-x:scroll">
+                  <h2>Project Limitations </h2>
+                  <div class="myText">
+                     I should also mention that this project is not (nor intended to be) a commercial or complete product.  Nor is it a new concept.  Instead, it is an exploration of how some aspects of a data scientist's work can be shared with other teams. And above all, a project to showcase my unique skillset of data science, web dev and business.</small></p>
+                     </br>
+                     If this project were to be taken further, then the following functionality would need to be added:
+                     <ul>
+                        <li>Algorithm tuning: hyperperameters could be adjusted (eg via dropdowns/checkboxes) to optimzie the models</li>
+                        <li>Predictive analysis: uploading unlabeled data to predict the dependent variable</li>
+                        <li>More robust functionality: see <i>Demo Only</i> section below</li>
+                     </ul>
+                  </div>
+                  </br>
+                  </br>
+                  <h2>Demo Only </h2>
+                  <div class="myText">
+                     Although this site is designed to upload data (as csv files), I have disabled this function and it can only be used in demo mode.
+                     </br>
+                     </br>
+                     Demo mode allows me to ensure that the concept is showcased without the site crashing.  This allows me to demonstrate the concept and move onto another project for my profile.
+                     </br>
+                     </br>
+                     If this were to be used in a real-world setting, then certain issues would need to be addressed.  They are not insurmountable, but do require coding time that I would prefer to put to another project.  The following issues are some examples:
+                     <ul>
+                        <li>NaNs</li>
+                        <li>Multiple headers</li>
+                        <li>ASCII encodings</li>
+                        <li>Large file sizes</li>
+                        <li>Non-csv files</li>
+                     </ul>
+                     Instead, it is an exploration of how some aspects of a data scientist's work can be shared with other teams. And above all, a project to showcase my unique skillset of data science, web dev and business.</small></p>
+                  </div>
+                  </br>
+                  <h2>Motivation </h2>
+                  <div class="myText">
+                     It is a reflection of how I combine the following skills:
+                     <ul>
+                        <li>Data Science - applying machine learning algorithms to business problems</li>
+                        <li>Web Development - presenting data and creating an interface for analytical tools </li>
+                        <li>Business Management - data-driven approaches to sales/marketing/finance/operations</li>
+                     </ul>
+                     Click on the LinkedIn logo below to learn more about how I combine a range of tech and business skills with startups.
+                  </div>
+               </div>
+            </div>
+            <div class="">
+               <div id="jumbo" class="jumbotron" style="overflow-x:scroll; overflow-y:scroll; white-space: nowrap;">
+                  <h2>Stack and Technologies </h2>
+                  <div class="myText">
+                     Frontend:
+                     <ul>
+                        <li>JavaScript</li>
+                        <li>JQuery</li>
+                        <li>Bootstrap</li>
+                        <li>HTML</li>
+                        <li>CSS</li>
+                     </ul>
+                     Backend:
+                     <ul>
+                        <li>Python</li>
+                        <li>Flask</li>
+                        <li>Jinja2</li>
+                        <li>AWS (EC2, 53 Route)</li>
+                     </ul>
+                     Model building and data-visualizations:
+                     <ul>
+                        <li>Numpy</li>
+                        <li>Pandas</li>
+                        <li>Matplotlib</li>
+                        <li>SK-Learn</li>
+                        <li>StatsModels</li>
+                     </ul>
+                     </br>
+                     Click on the GitHub logo below to explore the code.
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
    </div>
+</div>
 </div>
 <footer class="footer">
    <div class="container" align="center">

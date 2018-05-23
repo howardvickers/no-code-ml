@@ -21,248 +21,118 @@
    <!-- main.css is in static folder; href points to a "variable" defined by curly braces. -->
    <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet">
    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+   <link href="{{ url_for('static', filename='css/popper.min.js') }}" rel="stylesheet">
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
    <link href="{{ url_for('static', filename='css/jquery-3.3.1.min.js') }}" rel="stylesheet">
    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
    <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
    <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
-
-
-   <!-- <script>
-      $(document).ready(function(){
-          $('#uploadBTN').on('click', function(){
-              var fd = new FormData($("#fileinfo"));
-              //fd.append("CustomField", "This is some extra data");
-              $.ajax({
-                  url: 'upload.php',
-                  type: 'POST',
-                  data: fd,
-                  success:function(data){
-                      $('#output').html(data);
-                  },
-                  cache: false,
-                  contentType: false,
-                  processData: false
-              });
-          });
-      });
-      </script> -->
    <script>
-      $("#upload").submit(function(e) {
-        e.preventDefault();
-      });
-         $(document).ready(function(){
-           var upload_data = new FormData($('#upload')[0]);
-           console.log('upload_data', upload_data)
-             $("#button").click(function(){
-               console.log('upload_data after click', upload_data);
-               // e.preventDefault();
-                 $.ajax({
-                   data: upload_data,
-                   // console.log('data: upload_data', data),
-                   type : 'POST',
-                   url : '/uploadcsv',
+      $(document).ready(function() {
+       $('[data-rel=popover]').popover({
+         html: true,
+         trigger: "hover"
+       });
+      })
+         $(function() {
+           $('#upload_file_btn').click(function(e) {
+               console.log("yay upload web!")
+               var form_data = new FormData($('#upload_file')[0]);
+               console.log('this is form_data', form_data);
+               e.preventDefault();
+               $.ajax({
+                   type: 'POST',
+                   url: '/upload',
+                   data: form_data,
+                   contentType: false,
                    cache: false,
                    processData: false,
-                   contentType: false,
-                   success: function(d){
-                     console.log(d.head_table)
-                     $("#firsthead").html(d.head_table);
-                   }
+                   async: false,
+                   success: function(data) {
+                       console.log('Success!');
+                   },
                });
+           });
+         });
+
+         $(document).ready(function(){
+           var oForm3 = document.forms["form3"];
+             $("#button3").click(function(e){
+               console.log("yay change names!")
+                 e.preventDefault();
+                 var dataResults = $(oForm3).serializeArray();
+                 $.ajax({
+                   data: dataResults,
+                   type : 'POST',
+                   url : '/change_col_names',
+                   success: function(data){
+                     console.log('the newcolhead data:',  data.newcolhead)
+                     $("#newcolshead").html(data.newcolhead);
+                 }
+               })
              });
          });
-   </script>
-   <script>
-      $(function() {
-        $('#upload_file_btn').click(function(e) {
-            console.log("yay upload web!")
 
-            var form_data = new FormData($('#upload_file')[0]);
-            console.log('this is form_data', form_data);
-            e.preventDefault();
-            $.ajax({
-                type: 'POST',
-                url: '/upload',
-                data: form_data,
-                contentType: false,
-                cache: false,
-                processData: false,
-                async: false,
-                success: function(data) {
-                    console.log('Success!');
-                },
-            });
-        });
-      });
-   </script>
-   <script>
-      $(document).ready(function(){
-        // var oForm_upload = document.forms["form_upload"];
-          $("#button_upload").click(function(e){
-            console.log("yay upload ml.html!")
-              e.preventDefault();
-              var data = new FormData($('#form_upload'));
-              console.log('this is data', data);
-              // console.log('this is data', data);
-              data.append('file', $('#file')[0].files[0]);
-              console.log('this is data again', data);
+         $(document).ready(function(){
+           var oForm4 = document.forms["form4"];
+             $("#button4").click(function(e){
+                 e.preventDefault();
+                 var newcolsData = $(oForm4).serializeArray();
+                 $.ajax({
+                   data: newcolsData,
+                   type : 'POST',
+                   url : '/select_cols',
+                   success: function(data){
+                     feature_importances
+                     $("#newcols").html(data.columns);
+                     $("#html_select").html(data.html_select);
+                     $("#newhead").html(data.newhead);
+                     $("#ols_summary").html(data.ols_summary);
+                     $("#ols_results").html(data.ols_results);
+                     $("#feature_importances").html(data.feat_imps_chart);
+                 }
+               })
+             });
+         });
 
-              // var dataResults = $(oForm_upload).serializeArray();
-              $.ajax({
-                data: data,
-                type : 'POST',
-                url : '/upload',
-                // cache: false,
-                // contentType: false,
-                // processData: false,
-                // contentType: 'multipart/form-data',
-                success: function(data){
-                  console.log('the initial head data (head_table2):',  data)
-                  $("#initialhead").html(data.head_table2);
-              }
-            })
-          });
-      });
-   </script>
-   <script>
-      $(document).ready(function(){
-        var oForm3 = document.forms["form3"];
-          $("#button3").click(function(e){
-            console.log("yay change names!")
-              e.preventDefault();
-              var dataResults = $(oForm3).serializeArray();
-              $.ajax({
-                data: dataResults,
-                type : 'POST',
-                url : '/change_col_names',
-                success: function(data){
-                  console.log('the newcolhead data:',  data.newcolhead)
-                  $("#newcolshead").html(data.newcolhead);
-              }
-            })
-          });
-      });
-   </script>
-   <script>
-      $(document).ready(function(){
-        var oForm4 = document.forms["form4"];
-          $("#button4").click(function(e){
-              e.preventDefault();
-              var newcolsData = $(oForm4).serializeArray();
-              $.ajax({
-                data: newcolsData,
-                type : 'POST',
-                url : '/select_cols',
-                success: function(data){
-                  console.log('the newcols data:',  data.columns)
-                  console.log('the newhead data:',  data.newhead)
-                  console.log('the ols_summary data:',  data.ols_summary)
-                  console.log('the ols_results data:',  data.ols_results)
-                  console.log('the html_select data:',  data.html_select)
-                  feature_importances
-                  $("#newcols").html(data.columns);
-                  $("#html_select").html(data.html_select);
-                  $("#newhead").html(data.newhead);
-                  $("#ols_summary").html(data.ols_summary);
-                  $("#ols_results").html(data.ols_results);
-                  $("#feature_importances").html(data.feat_imps_chart);
-              }
-            })
-          });
-      });
-   </script>
-   <script>
-      $(document).ready(function(){
-          $("#button").click(function(e){
-            console.log("yay upload index.html!")
-            e.preventDefault();
-              $.ajax({
-                data: new FormData($('#upload')[0]),
-                type : 'POST',
-                url : '/uploadcsv',
-                cache: false,
-                processData: false,
-                contentType: false,
-                success: function(d){
-                  $("#firsthead").html(d.head_table);
-                }
-            });
-          });
-      });
-   </script>
-   <script>
-      $(document).ready(function(){
-        var oForm2 = document.forms["form2"];
-          $("#button2").click(function(e){
-            console.log("yay regressions!")
-            e.preventDefault();
-              var models = $(oForm2).serializeArray();
-              $.ajax({
-                data: models,
-                type : 'POST',
-                url : '/regressions',
-                success: function(data){
-                  console.log('the data:',  data)
-                  $("#regression_results").html(data);
-              }
-            })
-          });
-      });
+         $(document).ready(function(){
+           var oForm2 = document.forms["form2"];
+             $("#button2").click(function(e){
+               console.log("yay regressions!")
+               e.preventDefault();
+                 var models = $(oForm2).serializeArray();
+                 $.ajax({
+                   data: models,
+                   type : 'POST',
+                   url : '/regressions',
+                   success: function(data){
+                     console.log('the data:',  data)
+                     $("#regression_results").html(data);
+                 }
+               })
+             });
+         });
+
+      $(function () {
+         $('[data-toggle="popover"]').popover()
+         })
    </script>
 </head>
 {% endblock %}
 {% block content %}
 <div class="container">
 </br>
-<!-- <ul class="nav nav-tabs">
-   <li role="presentation" class="active"><a href="/">Step 1: Upload</a></li>
-   <li role="presentation"><a href="/data">Step 2: Select Columns</a></li>
-   <li role="presentation"><a href="/models">Step 3: Rename Columns</a></li>
-   <li role="presentation"><a href="/predictions">Predictions</a></li>
-   <li role="presentation"><a href="/county">County</a></li>
-   <li role="presentation"><a href="/state">State</a></li>
-   <li role="presentation"><a href="/about">About/Contact</a></li>
-</ul> -->
 <div class="page-header">
-   <h1>No-Code ML: <small>Code-Free Machine Learning</small></h1>
-   </br>
-   <!-- <div class="">
-      <div class="jumbotron" style="overflow-x:scroll; white-space: nowrap;">
-         <h3>Upload A CSV File - web</h3>
-
-      <form id="upload_file" method="post" enctype="multipart/form-data">
-       <fieldset>
-           <label for="file">Select a file</label>
-           <input name="file" type="file">
-       </fieldset>
-       <fieldset>
-           <button id="upload_file_btn" type="button">Upload web</button>
-       </fieldset>
-      </form>
-      </div>
-      </div> -->
-   <!-- <form id="fileinfo" enctype="multipart/form-data" method="post" name="fileinfo">
-      <label>File to stash:</label>
-      <input type="file" name="file" required />
-      </form>
-      <input type="button" value="Stash the file!"></input>
-      <div id="output"></div> -->
-   <!-- <div class="">
-      <div class="jumbotron" style="overflow-x:scroll; white-space: nowrap;">
-         <h3>Upload A CSV File</h3>
-         <form id="form_upload_id" name="form_upload" action="/upload" method="post" enctype="multipart/form-data" >
-           <div id="newcolshead">
-           </div>
-            <input type="file" name="data_file">
-            <button id="button_upload" type="submit" class="btn btn-primary" >Upload It!</button>
-         </form>
-      </div>
-      </div> -->
    <div class="container">
+     <div class=""><a href="/" style="text-decoration:none">
+        <div id="jumbo_top" class="jumbotron " style="overflow-x:scroll; overflow-y:scroll; white-space: nowrap;">
+           <h1>No-Code ML</h1>
+           <h1><small>Code-Free Machine Learning</small></h1>
+        </div></a>
+     </div>
       <div class="">
-         <div class="jumbotron" style="overflow-x:scroll; overflow-y:scroll; white-space: nowrap;">
-            <h3>Summary of Uploaded Data</h3>
+         <div id="jumbo_top" class="jumbotron" style="overflow-x:scroll; overflow-y:scroll; white-space: nowrap;">
+            <h3>Summary of Uploaded Data <button type="button" class="btn btn-sm btn-secondary" data-toggle="popover" title="Summary of Your Data" data-content="The below summary of your data can help you get a general understanding of the variables (columns) and the nature of the data.  You may need to scroll left/right."><i>i</i></button></h3>
             <div class="table table-hover">
                <div id="">
                   {{firsthead}}
@@ -272,20 +142,10 @@
       </div>
       <div class="">
          <div class="jumbotron" style="overflow-x:scroll; overflow-y:scroll; white-space: nowrap;">
-            <h3>Select Columns (html_select)</h3>
+            <h3>Select Columns <button type="button" class="btn btn-sm btn-secondary" data-toggle="popover" title="Choose Variables" data-content="You will most likely not use all your columns/variables in the regressions.  Choose those variables that you imagine are influencing the variable you want to predict (y or Dependent).  There should only be one Dependent column and it should show Drop. Click on the image icon for an example."><i>i</i></button>
+               <i class="menu-icon fa fa-picture-o " data-rel="popover" title="<strong>Example</strong>" data-placement="top" data-content="<img src='../static/images/col_select_example.png' width=100% height=100%>"></i></a>
+            </h3>
             <h3><small>Select Multiple Columns to Include and Select a Single Dependent (Y) Variable</small></h3>
-            <form name="form4" action="/select_cols">
-                <div id="html_select">
-                  {{html_select}}
-                </div>
-               <button id="button4" type="submit" class="btn btn-primary" >Select Columns</button>
-            </form>
-         </div>
-      </div>
-      <div class="">
-         <div class="jumbotron" style="overflow-x:scroll; overflow-y:scroll; white-space: nowrap;">
-            <h3>Select Columns</h3>
-            <!-- <h3><small>Select Multiple Columns to Include and Select a Single Dependent (Y) Variable</small></h3>
             <form name="form4" action="/select_cols">
                <table class="table table-hover">
                   <thead>
@@ -294,8 +154,6 @@
                         <th scope="col">Data Type</th>
                         <th scope="col">Include</th>
                         <th scope="col">Y Column</th>
-                        <th scope="col">Coefficients</th>
-                        <th scope="col">P Values</th>
                      </tr>
                   </thead>
                   <tbody>
@@ -303,48 +161,27 @@
                      <tr>
                         <td>{{col}}</td>
                         <td>{{typ[0]}}</td>
-                        <td><input type="checkbox" name="policyID" data-toggle="toggle" data-size="mini" value="keep" data-on="Include" data-off="Drop">
                         <td><input {{typ[1]}}  type="checkbox" name="{{col}}" data-toggle="toggle" data-size="mini" value="keep" data-on="Include" data-off="Drop" /></td>
                         <td><input {{typ[1]}} id="checkBox_{{columns.index(col)}}" type="checkbox" name="{{col}}" data-toggle="toggle" data-size="mini" value="y" data-on="Dependent" data-off="Independent" /></td>
-                        <td>{{typ[2]}}</td>
-                        <td>{{typ[3]}}</td>
                      </tr>
-                  {% endfor %}
-                </tbody>
+                     {% endfor %}
+                  </tbody>
                </table>
                <button id="button4" type="submit" class="btn btn-primary" >Select Columns</button>
-            </form> -->
+            </form>
          </div>
       </div>
       <div class="row">
          <div class="col-sm-6">
-            <div class="jumbotron" style="overflow-x:scroll; overflow-y:scroll; white-space: nowrap;">
-               <h3>OLS</h3>
+            <div id="jumbo" class="jumbotron" style="overflow-x:scroll; overflow-y:scroll; white-space: nowrap;">
+               <h3>OLS <button type="button" class="btn btn-sm btn-secondary" data-toggle="popover" title="Linear Regression Results" data-content="P Values can help you choose which variables to use in the model.  Variables with a P Value less than 0.05 are considered significant and should be kept in the model."><i>i</i></button></h3>
                <div id="ols_results">
-                 <!-- <table class="table table-hover">
-                    <thead>
-                       <tr>
-                          <th scope="col">Column</th>
-                          <th scope="col">Coefficients</th>
-                          <th scope="col">P Values</th>
-                       </tr>
-                    </thead>
-                    <tbody>
-                       {% for col, typ in cols_types.items() %}
-                       <tr>
-                          <td>{{col}}</td>
-                          <td>{{typ[2]}}</td>
-                          <td>{{typ[3]}}</td>
-                       </tr>
-                    {% endfor %}
-                  </tbody>
-                 </table> -->
                </div>
             </div>
          </div>
          <div class="col-sm-6">
-            <div class="jumbotron" style="overflow-x:scroll; overflow-y:scroll; white-space: nowrap;">
-               <h3>Feature Importances</h3>
+            <div id="jumbo" class="jumbotron" style="overflow-x:scroll; overflow-y:scroll; white-space: nowrap;">
+               <h3>Feature Importances  <button type="button" class="btn btn-sm btn-secondary" data-toggle="popover" title="Feature Importances Chart" data-content="Feature Importances can help you choose which variables to use in the model.  Variables with longer bars are contributing more to the model."><i>i</i></button></h3>
                <div id="feature_importances">
                </div>
             </div>
@@ -352,7 +189,7 @@
       </div>
       <div class="">
          <div class="jumbotron" style="overflow-x:scroll; white-space: nowrap;">
-            <h3>Rename Columns</h3>
+            <h3>Rename Columns  <button type="button" class="btn btn-sm btn-secondary" data-toggle="popover" title="Change Column Titles" data-content="Your raw data may not have column titles that are clear and meaningful for you.  You can change them here."><i>i</i></button></h3>
             <form name="form3" action="/change_col_names">
                <div id="newcols">
                </div>
@@ -362,9 +199,8 @@
       </div>
       <div class="">
          <div class="jumbotron" style="overflow-x:scroll; overflow-y:scroll; white-space: nowrap;">
-            <h3>Table Summary with New Column Names</h3>
+            <h3>Table Summary with New Column Names  <button type="button" class="btn btn-sm btn-secondary" data-toggle="popover" title="New Column Names" data-content="The new columns names will appear here in a summary table of the initial data."><i>i</i></button></h3>
             <div class="table table-hover">
-               <!-- <div id="result"> -->
                <div id="newcolshead">
                </div>
             </div>
@@ -372,8 +208,8 @@
       </div>
       <div class="row">
          <div class="col-sm-5">
-            <div class="jumbotron" style="overflow-x:scroll; overflow-y:scroll; white-space: nowrap;">
-               <h3>Run Regressions</h3>
+            <div id="jumbo" class="jumbotron" style="overflow-x:scroll; overflow-y:scroll; white-space: nowrap;">
+               <h3>Run Regressions  <button type="button" class="btn btn-sm btn-secondary" data-toggle="popover" title="Choose Algorithms" data-content="Select a couple of models from the list below and explore the results in the neighboring panel."><i>i</i></button></h3>
                <form name="form2" action="/regressions">
                   <table class="table table-hover">
                      <thead>
@@ -397,8 +233,8 @@
             </div>
          </div>
          <div class="col-sm-7">
-            <div class="jumbotron" style="overflow-x:scroll; overflow-y:scroll; white-space: nowrap;">
-               <h3>Regression Results</h3>
+            <div id="jumbo" class="jumbotron" style="overflow-x:scroll; overflow-y:scroll; white-space: nowrap;">
+               <h3>Regression Results <button type="button" class="btn btn-sm btn-secondary" data-toggle="popover" title="Results Here" data-content="Results from the regressions will appear here"><i>i</i></button></h3>
                <div id="regression_results">
                </div>
             </div>
