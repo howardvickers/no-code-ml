@@ -1,19 +1,8 @@
 # [no-code-ml.com](http://no-code-ml.com)
 ### Project Introduction
-This is a personal project to create a web app that allows someone with no coding experience to run machine learning algorithms on business data.
+This is a personal project to create a web app that allows someone to upload different csv files with registration details (eg name, contact details etc) and import into a fixed format database.  This could be useful for a company that receives lists of customers or members in different csv structures and needs to enter this data into their own database.
 
-Machine Learning and Data Science present two main barriers to entry:
-* Coding skills (eg python, R, etc)
-* Theoretical background (eg statistics, math etc)
-
-This web app explores how the first barrier can be overcome with a point-n-click interface to use machine learning techniques that normally require good knowledge of python, pandas, numpy and similar programming skills.
-
-The second barrier could be addressed with step-by-step guidance and training; this is considered beyond the immediate scope of this project.
-
-Note that the web app is intended as a conceptual project rather than a commercial product. It aims to showcase the programmer's combined skillset of data science and web dev.
-
-### Business Context
-This project is guided by a sense of a hyperthetical, yet practical business situation: a startup has sales or other data that is available as a csv file and wishes to gain insights into the data; perhaps a desire to predict future sales and to understand where to employ resources for the best performance.  
+Note that the web app is intended as a conceptual project rather than a commercial product. It aims to showcase the programmer's skillset of data pipeline management and web dev.
 
 ### Functionality  
 The web app offers the following functionality:
@@ -53,3 +42,4 @@ The web app offers the following functionality:
 * bootstrap
 * html
 * css
+# uploadcsv
